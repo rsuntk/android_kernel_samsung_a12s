@@ -373,7 +373,7 @@ int kbase_dma_fence_wait(struct kbase_jd_atom *katom,
 #endif
 		if (!test_bit(i, info->dma_fence_excl_bitmap)) {
 #if (KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE)
-			err = reservation_object_reserve_shared(obj);
+			err = reservation_object_reserve_shared(obj, 1);
 #else
 			err = dma_resv_reserve_shared(obj, 0);
 #endif
