@@ -5,3 +5,6 @@ obj-$(CONFIG_SW_SYNC)		+= sw_sync.o sync_debug.o
 obj-$(CONFIG_UDMABUF)		+= udmabuf.o
 obj-$(CONFIG_DMA_BUF_CONTAINER)	+= dma-buf-container.o
 obj-$(CONFIG_DMABUF_TRACE)	+= dma-buf-trace.o
+
+dmabuf_selftests-y := selftest.o
+obj-$(CONFIG_DMABUF_SELFTESTS)	+= dmabuf_selftests.o
