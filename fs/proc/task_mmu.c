@@ -1728,7 +1728,7 @@ static int reclaim_pte_range(pmd_t *pmd, unsigned long addr,
 	if (pmd_trans_unstable(pmd))
 		return 0;
 cont:
-	if (rwsem_is_contended(&walk->mm->mmap_sem))
+	if (rwsem_is_contended(&walk->mm->mmap_lock))
 		return -1;
 
 	isolated = 0;
@@ -1798,7 +1798,7 @@ static int writeback_pte_range(pmd_t *pmd, unsigned long addr,
 	split_huge_pmd(vma, pmd, addr);
 	if (pmd_trans_unstable(pmd))
 		return 0;
-	if (rwsem_is_contended(&mm->mmap_sem))
+	if (rwsem_is_contended(&mm->mmap_lock))
 		return -1;
 	if (zram_is_app_launch())
 		return -EBUSY;
