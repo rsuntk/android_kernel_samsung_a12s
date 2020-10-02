@@ -148,6 +148,12 @@ static LIST_HEAD(drvdata_list);
 /* MAX SIZE of COUNT_VALUE in PACKET_CNT_REG */
 #define S3C64XX_SPI_PACKET_CNT_MAX 0xfff0
 
+struct s3c64xx_spi_dma_data {
+	struct dma_chan *ch;
+	dma_cookie_t cookie;
+	enum dma_transfer_direction direction;
+};
+
 /**
  * struct s3c64xx_spi_info - SPI Controller hardware info
  * @fifo_lvl_mask: Bit-mask for {TX|RX}_FIFO_LVL bits in SPI_STATUS register.
@@ -634,8 +640,13 @@ static void enable_datapath(struct s3c64xx_spi_driver_data *sdd,
 		}
 	}
 
+	if (ret)
+		return ret;
+
 	writel(modecfg, regs + S3C64XX_SPI_MODE_CFG);
 	writel(chcfg, regs + S3C64XX_SPI_CH_CFG);
+
+	return 0;
 }
 
 static inline void enable_cs(struct s3c64xx_spi_driver_data *sdd,
@@ -771,10 +782,30 @@ static inline void disable_cs(struct s3c64xx_spi_driver_data *sdd,
 	}
 }
 
-static void s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
+static inline void disable_cs(struct s3c64xx_spi_driver_data *sdd,
+						struct spi_device *spi)
+{
+	struct s3c64xx_spi_csinfo *cs = spi->controller_data;
+
+	if (sdd->tgl_spi == spi)
+		sdd->tgl_spi = NULL;
+
+	if(cs->line != 0)
+		gpio_set_value(cs->line, spi->mode & SPI_CS_HIGH ? 0 : 1);
+
+	if (cs->cs_mode != AUTO_CS_MODE) {
+		/* Quiese the signals */
+		writel(spi->mode & SPI_CS_HIGH
+			? 0 : S3C64XX_SPI_SLAVE_SIG_INACT,
+		       sdd->regs + S3C64XX_SPI_SLAVE_SEL);
+	}
+}
+
+static int s3c64xx_spi_config(struct s3c64xx_spi_driver_data *sdd)
 {
 	struct s3c64xx_spi_info *sci = sdd->cntrlr_info;
 	void __iomem *regs = sdd->regs;
+	int ret;
 	u32 val;
 	int ret;
 
@@ -1075,6 +1106,11 @@ try_transfer:
 		}
 
 		spin_unlock_irqrestore(&sdd->lock, flags);
+
+		if (status) {
+			dev_err(&spi->dev, "failed to enable data path for transfer: %d\n", status);
+			break;
+		}
 
 		status = wait_for_xfer(sdd, xfer, use_dma);
 
