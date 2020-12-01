@@ -2985,6 +2985,7 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
 	void *src, *dst, *mem;
 	struct zcomp_strm *zstrm;
 	struct page *page = bvec->bv_page;
+	struct mem_cgroup *memcg = page_memcg(page);
 	unsigned long element = 0;
 	enum zram_pageflags flags = 0;
 #ifdef CONFIG_ZRAM_LRU_WRITEBACK
@@ -3087,8 +3088,8 @@ out:
 		zram_set_handle(zram, index, handle);
 		zram_set_obj_size(zram, index, comp_len);
 #ifdef CONFIG_ZRAM_LRU_WRITEBACK
-		if (!page->mem_cgroup ||
-		    page->mem_cgroup->swappiness != NON_LRU_SWAPPINESS) {
+		if (!page_memcg(page) ||
+		    memcg->swappiness != NON_LRU_SWAPPINESS) {
 			spin_lock_irqsave(&zram->list_lock, irq_flags);
 			list_add_tail(&zram->table[index].lru_list, &zram->list);
 			spin_unlock_irqrestore(&zram->list_lock, irq_flags);
