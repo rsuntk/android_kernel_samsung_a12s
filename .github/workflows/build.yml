@@ -2,7 +2,7 @@ name: Build Kernel
 
 on:
   workflow_dispatch:
-    input:
+    inputs:
       REV:
         description: 'Kernel Revision (ex: 3)'
         required: false
