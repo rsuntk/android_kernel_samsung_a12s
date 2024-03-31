@@ -40,12 +40,10 @@ jobs:
           export SELINUX_STATE=${{ github.event.inputs.USE_PERMISSIVE }}
           bash $(pwd)/build_github.sh
         working-directory: android_kernel_samsung_a12s
-      - name: Upload files
-        uses: actions/upload-artifact@v4
-        with:
-          name: Kernelfiles
-          path: |
-          	android_kernel_samsung_a12s/rsuntk/*.img
-          	android_kernel_samsung_a12s/rsuntk/*.tar
-          	android_kernel_samsung_a12s/out/arch/arm64/boot/Image
-           	android_kernel_samsung_a12s/out/arch/arm64/boot/Image.gz
+      - name: Upload the files
+      	uses: actions/upload-artifact@v4
+        path: |
+          android_kernel_samsung_a12s/rsuntk/*.img
+          android_kernel_samsung_a12s/rsuntk/*.tar
+          android_kernel_samsung_a12s/out/arch/arm64/boot/Image
+          android_kernel_samsung_a12s/out/arch/arm64/boot/Image.gz
