@@ -168,7 +168,7 @@ build_krenol() {
 	echo "- Building configs ...";
 	echo "Started @ `date`";
 	echo "";
-	make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y rsuntk_defconfig > /dev/null
+	make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y github_defconfig > /dev/null
 
 	echo "";
 	echo "- Building kernel ...";
