@@ -11,6 +11,7 @@
 ID=$(./rsuntk/bin/gen_id)
 display_summary() {
 	echo "";
+	echo "**** Summary ****"
 	echo "";
 	echo REVISION: $REV
 	echo LOCALVERSION: $LOCALVERSION
