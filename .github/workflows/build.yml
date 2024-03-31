@@ -42,8 +42,10 @@ jobs:
       working-directory: android_kernel_samsung_a12s
     - name: Upload the files
       uses: actions/upload-artifact@v4.3.1
-      path: |
-        android_kernel_samsung_a12s/rsuntk/*.img
-        android_kernel_samsung_a12s/rsuntk/*.tar
-        android_kernel_samsung_a12s/out/arch/arm64/boot/Image
-        android_kernel_samsung_a12s/out/arch/arm64/boot/Image.gz
+      with:
+        name: kernelfiles
+        path: |
+          android_kernel_samsung_a12s/rsuntk/*.img
+          android_kernel_samsung_a12s/rsuntk/*.tar
+          android_kernel_samsung_a12s/out/arch/arm64/boot/Image
+          android_kernel_samsung_a12s/out/arch/arm64/boot/Image.gz
