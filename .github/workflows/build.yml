@@ -31,7 +31,7 @@ jobs:
       run: |
         sudo apt update -y
         sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl curl -y
-        sudo aptitude install libssl-dev
+        sudo aptitude install libssl-dev -y
     - name: Build with Clang
       run: |
         export REV={{ github.event.inputs.REV }}
