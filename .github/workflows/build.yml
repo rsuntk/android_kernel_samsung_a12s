@@ -34,7 +34,7 @@ jobs:
         sudo aptitude install libssl-dev -y
     - name: Build with Clang
       run: |
-        export REV={{ github.event.inputs.REV }}
+        export REV=${{ github.event.inputs.REV }}
         export LOCALVERSION=${{ github.event.inputs.STRINGS }}
         export KSU=${{ github.event.inputs.KERNELSU_SUPPORT }}
         export SELINUX_STATE=${{ github.event.inputs.USE_PERMISSIVE }}
