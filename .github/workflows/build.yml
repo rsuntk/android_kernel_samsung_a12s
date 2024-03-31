@@ -1,0 +1,61 @@
+name: Build Kernel
+on:
+  workflow_dispatch:
+    inputs:
+      REV:
+        description: 'Kernel Revision (ex: 3)'
+        required: false
+      STRINGS:
+        description: 'Kernel String (ex: MyKernel)'
+        required: true
+        default: 'MyKernel'
+      KERNELSU_SUPPORT:
+        description: 'Add KernelSU support (y/n)'
+        required: true
+        default: 'n'
+      USE_PERMISSIVE:
+        description: 'Is SELinux permissive (y/n)'
+        required: true
+        default: 'n'
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: android_kernel_samsung_a12s
+          fetch-depth: 0
+      - name: Prepare dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt install git bison flex aptitude bc cpio python-is-python3 tar perl curl -y
+          sudo aptitude install libssl-dev -y
+          export REV=${{ github.event.inputs.REV }}
+          export LOCALVERSION=${{ github.event.inputs.STRINGS }}
+          export KSU=${{ github.event.inputs.KERNELSU_SUPPORT }}
+          export SELINUX_STATE=${{ github.event.inputs.USE_PERMISSIVE }}
+      - name: Build with Clang
+        run: |
+          bash $(pwd)/build_github.sh
+        working-directory: android_kernel_samsung_a12s
+      - name: Upload img
+        uses: actions/upload-artifact@v4
+        with:
+          name: twrp_flashable
+          path: android_kernel_samsung_a12s/rsuntk/*.img
+      - name: Upload tar
+        uses: actions/upload-artifact@v4
+        with:
+          name: odin_flashable
+          path: android_kernel_samsung_a12s/rsuntk/*.tar
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: Image
+          path: android_kernel_samsung_a12s/out/arch/arm64/boot/Image
+      - name: Upload Image.gz
+        uses: actions/upload-artifact@v4
+        with:
+          name: Image-gz
+          path: android_kernel_samsung_a12s/out/arch/arm64/boot/*.gz
