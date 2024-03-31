@@ -8,13 +8,13 @@
 ########################
 ## Export these flags ##
 ########################
-ID=$(./rsuntk/bin/gen_id)
+IS_PERMISSIVE=n
 exports() {
 	export ARCH=arm64
 	export ANDROID_MAJOR_VERSION=t
 	export PLATFORM_VERSION=13
-	export REV="3" # Export your revision, you can set this to add it at /proc/version
-	export LOCALVERSION="TragicHorizon"
+	export REV="" # Export your revision, you can set this to add it at /proc/version
+	export LOCALVERSION=""
 	export KCFLAGS=-w
 	export CONFIG_SECTION_MISMATCH_WARN_ONLY=y
 	export gen_id="$rsudir/bin/gen_id" ## gen_id: generate unique id for the kernel_strings
@@ -27,10 +27,8 @@ exports() {
 PROC_NUM=$(nproc --all);
 MIN_PROCESSOR_CORES="2";
 CPU=$(lscpu | grep -i 'model name' | cut -d ':' -f 2 | sed 's/^[[:space:]]*//')
+ID=$(./rsuntk/bin/gen_id)
 rsudir="$(pwd)/rsuntk" ## rissu's path
-bold=$(tput bold)
-normal=$(tput sgr0)
-IS_PERMISSIVE=n
 
 if [ -d $(pwd)/KernelSU ]; then
 	KSU_TAGS=$(cd KernelSU && git describe --tags)
@@ -61,32 +59,46 @@ else
 fi
 
 create_boot() { # make a flashable boot.img/tar, so we don't need custom AnyKernel3
-	echo "";
-	echo "-- Flashable boot creator --"
-	echo "* Format: .img & .tar"
-	echo "";
-	
 	# Spit out.. a variable!
 	mgsk="$rsudir/bin/magiskboot" ## magiskboot: for un/repack boot.img
 	outdir="../out" ## out path
 	stock_boot="$rsudir/A127FXXU9DWE4.tar.xz" ## stock boot.img: A127FXXU9DWE4
+	
 	chmod +x $mgsk ## giving magiskboot executable permission
-	#chmod +x $gen_id
-	DATE=$(date +'%Y%m%d%H%M%S');
+	chmod +x $gen_id
+	
+	if [ -z $REV ]; then
+		KERN_REV="$(echo $ID)"
+	else
+		KERN_REV="r$(echo $REV)"
+	fi
 	
 	# Format
-	BOOT_FMT="TragicHorizon-r$(echo $REV)_$(echo $DATE).img"
-	TAR_FMT="TragicHorizon-r$(echo $REV)_$(echo $DATE).tar"
+	DATE=$(date +'%Y%m%d%H%M%S');
+	BOOT_FMT="TragicHorizon-$(echo $KERN_REV)_$(echo $DATE).img"
+	TAR_FMT="TragicHorizon-$(echo $KERN_REV)_$(echo $DATE).tar"
 	
 	cd $rsudir ## switch to rissu's path
-	
+	rsu_banner() {
+printf "
+  _____  _               
+ |  __ \(_)              
+ | |__) |_ ___ ___ _   _
+ |  _  /| / __/ __| | | |
+ | | \ \| \__ \__ \ |_| |
+ |_|  \_\_|___/___/\__,_|
+
+- Boot file: $rsudir/boot.img
+";                 
+	}
+	rsu_banner;
 	# The cores are in here! Below this line
 	if [ ! -f $mgsk ]; then
 		echo "";
-		echo "- Image creation failed, you can create it manually"
+		echo "- Failed to execute magiskboot. is the file exist?"
 		echo "";
 		cd ..
-		exit;
+		exit 1;
 	else
 		echo "";
 		echo "- Unpacking stock boot ...."
@@ -98,30 +110,23 @@ create_boot() { # make a flashable boot.img/tar, so we don't need custom AnyKern
 
 		## cross-checking if the out dir, image files do exist
 		if [ ! -d $outdir ] && [ ! -f $outdir/arch/$ARCH/boot/Image ] && [ ! -f $outdir/arch/$ARCH/boot/Image.gz ]; then
-			echo "";
-			echo "! Kernel build is failed? No such required files or directory";
-			echo "";
+			echo "- Kernel build is failed? No such required files or directory";
 			exit 1;
 		else	
 			cp $outdir/arch/$ARCH/boot/Image $rsudir/kernel
 		fi
 		
-		echo "";
-		echo "- Repacking patched boot ...."
-		echo "";
+		echo "- Repacking patched boot"
 		
 		$mgsk repack $rsudir/boot.img 2>/dev/null
 		rm $rsudir/boot.img ## remove the stock boot.img
 		mv $rsudir/new-boot.img $rsudir/boot.img ## rename the patched boot.img
 		tar -cf $TAR_FMT boot.img ## make it odin flashable
 		mv $rsudir/boot.img $rsudir/$BOOT_FMT ## rename the patched boot.img
-		mv $outdir/arch/$ARCH/boot/Image $rsudir
-		mv $outdir/arch/$ARCH/boot/Image.gz $rsudir
 		
 		echo "";
-		echo "- Image creation done!";
-		echo "* Result:"
-		printf "${bold}TAR (odin flashable): `echo $rsudir/$TAR_FMT`\nIMG (twrp flashable): `echo $rsudir/$BOOT_FMT`\nGZ (compressed image): `echo $rsudir/Image.gz`\nRAW (uncompressed image): `echo $rsudir/Image`\n${normal}";
+		echo "- Done!";
+		echo "- Output file: $BOOT_FMT"
 		echo "";
 		
 		echo "";
@@ -132,6 +137,7 @@ create_boot() { # make a flashable boot.img/tar, so we don't need custom AnyKern
 		if [ -f $rsudir/ramdisk.cpio ]; then
 			rm $rsudir/ramdisk.cpio
 		fi
+		
 		cd ..
 	fi
 }

@@ -1,6 +1,8 @@
 #! /usr/bin/env bash
 
 # Rissu Project (C) 2024
+# Intended for GitHub CI
+# Maybe its very messy.
 
 # This build script contributor:
 # Rissu <farisjihadih@outlook.com>
@@ -93,10 +95,16 @@ create_boot() { # make a flashable boot.img/tar, so we don't need custom AnyKern
 	chmod +x $mgsk ## giving magiskboot executable permission
 	chmod +x $gen_id
 	
+	if [ -z $REV ]; then
+		KERN_REV="$(echo $ID)"
+	else
+		KERN_REV="r$(echo $REV)"
+	fi
+	
 	# Format
 	DATE=$(date +'%Y%m%d%H%M%S');
-	BOOT_FMT="TragicHorizon-r$(echo $REV)_$(echo $DATE).img"
-	TAR_FMT="TragicHorizon-r$(echo $REV)_$(echo $DATE).tar"
+	BOOT_FMT="TragicHorizon-$(echo $KERN_REV)_$(echo $DATE).img"
+	TAR_FMT="TragicHorizon-$(echo $KERN_REV)_$(echo $DATE).tar"
 	
 	cd $rsudir ## switch to rissu's path
 	rsu_banner() {
@@ -108,7 +116,7 @@ printf "
  | | \ \| \__ \__ \ |_| |
  |_|  \_\_|___/___/\__,_|
 
-- Boot file: $rsuntk/boot.img
+- Boot file: $rsudir/boot.img
 ";                 
 	}
 	rsu_banner;
