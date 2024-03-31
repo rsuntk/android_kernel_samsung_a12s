@@ -9,6 +9,19 @@
 ## Export these flags ##
 ########################
 ID=$(./rsuntk/bin/gen_id)
+display_summary() {
+	echo "";
+	echo "";
+	echo REVISION: $REV
+	echo LOCALVERSION: $LOCALVERSION
+	echo USE_KSU: $KSU
+	echo USE_PERMISSIVE: $SELINUX_STATE
+	echo "";
+	echo "";
+	sleep 4
+}
+display_summary;
+}
 exports() {
 	export ARCH=arm64
 	export ANDROID_MAJOR_VERSION=t
@@ -71,32 +84,40 @@ else
 fi
 
 create_boot() { # make a flashable boot.img/tar, so we don't need custom AnyKernel3
-	echo "";
-	echo "-- Flashable boot creator --"
-	echo "* Format: .img & .tar"
-	echo "";
-	
 	# Spit out.. a variable!
 	mgsk="$rsudir/bin/magiskboot" ## magiskboot: for un/repack boot.img
 	outdir="../out" ## out path
 	stock_boot="$rsudir/A127FXXU9DWE4.tar.xz" ## stock boot.img: A127FXXU9DWE4
+	
 	chmod +x $mgsk ## giving magiskboot executable permission
-	#chmod +x $gen_id
-	DATE=$(date +'%Y%m%d%H%M%S');
+	chmod +x $gen_id
 	
 	# Format
+	DATE=$(date +'%Y%m%d%H%M%S');
 	BOOT_FMT="TragicHorizon-r$(echo $REV)_$(echo $DATE).img"
 	TAR_FMT="TragicHorizon-r$(echo $REV)_$(echo $DATE).tar"
 	
 	cd $rsudir ## switch to rissu's path
-	
+	rsu_banner() {
+printf "
+  _____  _               
+ |  __ \(_)              
+ | |__) |_ ___ ___ _   _
+ |  _  /| / __/ __| | | |
+ | | \ \| \__ \__ \ |_| |
+ |_|  \_\_|___/___/\__,_|
+
+- Boot file: $rsuntk/boot.img
+";                 
+	}
+	rsu_banner;
 	# The cores are in here! Below this line
 	if [ ! -f $mgsk ]; then
 		echo "";
-		echo "- Image creation failed, you can create it manually"
+		echo "- Failed to execute magiskboot. is the file exist?"
 		echo "";
 		cd ..
-		exit;
+		exit 1;
 	else
 		echo "";
 		echo "- Unpacking stock boot ...."
@@ -108,30 +129,23 @@ create_boot() { # make a flashable boot.img/tar, so we don't need custom AnyKern
 
 		## cross-checking if the out dir, image files do exist
 		if [ ! -d $outdir ] && [ ! -f $outdir/arch/$ARCH/boot/Image ] && [ ! -f $outdir/arch/$ARCH/boot/Image.gz ]; then
-			echo "";
-			echo "! Kernel build is failed? No such required files or directory";
-			echo "";
+			echo "- Kernel build is failed? No such required files or directory";
 			exit 1;
 		else	
 			cp $outdir/arch/$ARCH/boot/Image $rsudir/kernel
 		fi
 		
-		echo "";
-		echo "- Repacking patched boot ...."
-		echo "";
+		echo "- Repacking patched boot"
 		
 		$mgsk repack $rsudir/boot.img 2>/dev/null
 		rm $rsudir/boot.img ## remove the stock boot.img
 		mv $rsudir/new-boot.img $rsudir/boot.img ## rename the patched boot.img
 		tar -cf $TAR_FMT boot.img ## make it odin flashable
 		mv $rsudir/boot.img $rsudir/$BOOT_FMT ## rename the patched boot.img
-		mv $outdir/arch/$ARCH/boot/Image $rsudir
-		mv $outdir/arch/$ARCH/boot/Image.gz $rsudir
 		
 		echo "";
-		echo "- Image creation done!";
-		echo "* Result:"
-		printf "${bold}TAR (odin flashable): `echo $rsudir/$TAR_FMT`\nIMG (twrp flashable): `echo $rsudir/$BOOT_FMT`\nGZ (compressed image): `echo $rsudir/Image.gz`\nRAW (uncompressed image): `echo $rsudir/Image`\n${normal}";
+		echo "- Done!";
+		echo "- Output file: $BOOT_FMT"
 		echo "";
 		
 		echo "";
@@ -142,6 +156,7 @@ create_boot() { # make a flashable boot.img/tar, so we don't need custom AnyKern
 		if [ -f $rsudir/ramdisk.cpio ]; then
 			rm $rsudir/ramdisk.cpio
 		fi
+		
 		cd ..
 	fi
 }
