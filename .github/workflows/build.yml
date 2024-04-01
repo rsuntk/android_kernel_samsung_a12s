@@ -23,17 +23,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Prepare environment
-      run: |
-        echo $REV
-        echo $LOCALVERSION
-        echo $KSU
-        echo $SELINUX_STATE
-      env:
-        REV: ${{ github.event.inputs.REV }}
-        LOCALVERSION: ${{ github.event.inputs.STRINGS }}
-        KSU: ${{ github.event.inputs.KERNELSU_SUPPORT }}
-        SELINUX_STATE: ${{ github.event.inputs.USE_PERMISSIVE }}
     - uses: actions/checkout@v4
       with:
         path: android_kernel_samsung_a12s
@@ -45,7 +34,16 @@ jobs:
         sudo aptitude install libssl-dev -y
     - name: Build with Clang
       run: |
+        export REV=$REV_INPUT
+        export LOCALVERSION=$LOCALVERSION_INPUT
+        export KSU=$KERNELSU_STATE_INPUT
+        export SELINUX_STATE=$SELINUX_STATE_INPUT
         bash $(pwd)/ci_script/github_ci.sh
+      env:
+        REV_INPUT: ${{ github.event.inputs.REV }}
+        LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
+        KERNELSU_STATE_INPUT: ${{ github.event.inputs.KERNELSU_SUPPORT }}
+        SELINUX_STATE_INPUT: ${{ github.event.inputs.USE_PERMISSIVE }}
       working-directory: android_kernel_samsung_a12s
     - name: Upload the files
       uses: actions/upload-artifact@v4.3.1
