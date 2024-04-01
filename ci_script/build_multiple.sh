@@ -4,6 +4,8 @@
 # Rissu Project (C) 2024
 #
 
+export GITSHA=$(git describe --tags --always)
+
 bash $(pwd)/ci_script/build_ksu_stable_permissive.sh
 rm -rR $(pwd)/out -f
 
