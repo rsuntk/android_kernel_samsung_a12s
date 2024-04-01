@@ -47,7 +47,7 @@ jobs:
         export KSU_BRANCH=$KERNELSU_BRANCH_INPUT
         export KSU=$KERNELSU_STATE_INPUT
         export SELINUX_STATE=$SELINUX_STATE_INPUT
-        bash $(pwd)/ci_script/github_ci.sh
+        bash $(pwd)/ci_script/single_ci_build.sh
       env:
         REV_INPUT: ${{ github.event.inputs.REV }}
         LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
@@ -62,6 +62,4 @@ jobs:
         path: |
           android_kernel_samsung_a12s/rsuntk/*.img
           android_kernel_samsung_a12s/rsuntk/*.tar
-          android_kernel_samsung_a12s/out/arch/arm64/boot/Image
-          android_kernel_samsung_a12s/out/arch/arm64/boot/Image.gz
-
+          android_kernel_samsung_a12s/rsuntk/readme.txt
