@@ -17,6 +17,7 @@ display_summary() {
 	echo "";
 	echo REVISION: $REV
 	echo LOCALVERSION: $LOCALVERSION
+	echo KERNELSU_BRANCH: $KSU_BRANCH
 	echo USE_KSU: $KSU
 	echo USE_PERMISSIVE: $SELINUX_STATE
 	echo "";
@@ -51,7 +52,11 @@ fi
 
 if [[ $KSU = 'true' ]]; then
 	rm $(pwd)/KernelSU
-	curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+	if [[ $KSU_BRANCH = 'dev' ]]; then
+		curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
+	else
+		curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+	fi
 	if [ -d $(pwd)/KernelSU ]; then
 		KSU_TAGS=$(cd KernelSU && git describe --tags)
 		export KSU_LINE="$KSU_TAGS"
