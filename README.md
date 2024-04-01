@@ -5,7 +5,7 @@ There's 2 method available here: CI (Github Action) and Manual build
 1. Fork the repository
 2. Go to Actions tab
 3. Click 'I understand my workflows, go ahead and enable them'
-4. Go to Kernel Build
+4. Go to Build Kernel
 5. Click 'Run workflow'
 6. Set the variable
 7. And click 'Run workflow' again
