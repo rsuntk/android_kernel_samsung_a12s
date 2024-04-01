@@ -45,7 +45,7 @@ jobs:
         sudo aptitude install libssl-dev -y
     - name: Build with Clang
       run: |
-        bash $(pwd)/build_github.sh
+        bash $(pwd)/ci_script/github_ci.sh
       working-directory: android_kernel_samsung_a12s
     - name: Upload the files
       uses: actions/upload-artifact@v4.3.1

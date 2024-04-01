@@ -7,13 +7,15 @@
 # This build script contributor:
 # Rissu <farisjihadih@outlook.com>
 
+cd ..
+
 ########################
 ## Export these flags ##
 ########################
 ID=$(./rsuntk/bin/gen_id)
 display_summary() {
 	echo "";
-	echo "**** Summary ****"
+	echo "***** Summary *****"
 	echo "";
 	echo REVISION: $REV
 	echo LOCALVERSION: $LOCALVERSION
@@ -32,8 +34,6 @@ exports() {
 	export KCFLAGS=-w
 	export CONFIG_SECTION_MISMATCH_WARN_ONLY=y
 	export gen_id="$rsudir/bin/gen_id" ## gen_id: generate unique id for the kernel_strings
-	## I added these lines, for you that might not sure or something....
-	## but, i rather choose to edit these variable on the Makefile itself.
 	export CC="$(pwd)/toolchains/clang/bin/clang";
 	export CROSS_COMPILE="$(pwd)/toolchains/google/bin/aarch64-linux-android-"
 }
@@ -45,18 +45,15 @@ rsudir="$(pwd)/rsuntk" ## rissu's path
 bold=$(tput bold)
 normal=$(tput sgr0)
 
-if [[ $SELINUX_STATE = 'y' ]] || [[ $SELINUX_STATE = 'Y' ]] || [[ $SELINUX_STATE = 'Yes' ]] || [[ $SELINUX_STATE = 'yes' ]] || [[ $SELINUX_STATE = 'YES' ]]; then
+if [[ $SELINUX_STATE = 'true' ]]; then
 	IS_PERMISSIVE=y
 else
 	IS_PERMISSIVE=n
 fi
 
-if [[ $KSU = 'y' ]] || [[ $KSU = 'Y' ]] || [[ $KSU = 'Yes' ]] || [[ $KSU = 'yes' ]] || [[ $KSU = 'YES' ]]; then
+if [[ $KSU = 'true' ]]; then
 	rm $(pwd)/KernelSU
 	curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-fi
-
-if [[ $KSU = 'y' ]] || [[ $KSU = 'Y' ]] || [[ $KSU = 'Yes' ]] || [[ $KSU = 'yes' ]] || [[ $KSU = 'YES' ]]; then
 	if [ -d $(pwd)/KernelSU ]; then
 		KSU_TAGS=$(cd KernelSU && git describe --tags)
 		export KSU_LINE="$KSU_TAGS"
@@ -190,7 +187,7 @@ build_krenol() {
 		echo "- Using $(nproc --all) cores.";
 		echo "";
 		
-		if [[ $KSU = 'y' ]] || [[ $KSU = 'Y' ]] || [[ $KSU = 'Yes' ]] || [[ $KSU = 'yes' ]] || [[ $KSU = 'YES' ]]; then
+		if [[ $KSU = 'true' ]]; then
 			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(nproc --all)
 		else
 			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(nproc --all)
@@ -200,7 +197,7 @@ build_krenol() {
 		echo "-- CPU: $CPU";
 		echo "- Using 1 core.";
 		echo "";
-		if [[ $KSU = 'y' ]] || [[ $KSU = 'Y' ]] || [[ $KSU = 'Yes' ]] || [[ $KSU = 'yes' ]] || [[ $KSU = 'YES' ]]; then
+		if [[ $KSU = 'true' ]]; then
 			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION)
 		else
 			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION)
@@ -210,7 +207,7 @@ build_krenol() {
 		echo "-- CPU: $CPU";
 		echo "- Using $MIN_PROCESSOR_CORES cores.";
 		echo "";
-		if [[ $KSU = 'y' ]] || [[ $KSU = 'Y' ]] || [[ $KSU = 'Yes' ]] || [[ $KSU = 'yes' ]] || [[ $KSU = 'YES' ]]; then
+		if [[ $KSU = 'true' ]]; then
 			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(echo $MIN_PROCESSOR_CORES)
 		else
 			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(echo $MIN_PROCESSOR_CORES)
