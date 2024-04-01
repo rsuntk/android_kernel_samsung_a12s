@@ -160,19 +160,19 @@ build_krenol() {
 		echo "-- CPU: $CPU";
 		echo "- Using $(nproc --all) cores.";
 		echo "";
-		make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(nproc --all)
+		make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)" -j$(nproc --all)
 	elif [[ $PROC_NUM -lt $MIN_PROCESSOR_CORES ]]; then
 		echo ""
 		echo "-- CPU: $CPU";
 		echo "- Using 1 core.";
 		echo "";
-		make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION)
+		make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)"
 	else
 		echo ""
 		echo "-- CPU: $CPU";
 		echo "- Using $MIN_PROCESSOR_CORES cores.";
 		echo "";
-		make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(echo $MIN_PROCESSOR_CORES)
+		make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)" -j$(echo $MIN_PROCESSOR_CORES)
 	fi
 
 	echo "";
