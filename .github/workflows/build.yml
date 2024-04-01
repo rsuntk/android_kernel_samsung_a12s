@@ -11,11 +11,11 @@ on:
         required: true
         default: 'MyKernel'
       KERNELSU_SUPPORT:
-        description: 'Add KernelSU support'
+        description: 'KernelSU support'
         required: true
         type: boolean
       USE_PERMISSIVE:
-        description: 'Is SELinux Permissive'
+        description: 'SELinux Permissive'
         required: true
         type: boolean
         

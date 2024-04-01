@@ -7,8 +7,6 @@
 # This build script contributor:
 # Rissu <farisjihadih@outlook.com>
 
-cd ..
-
 ########################
 ## Export these flags ##
 ########################
