@@ -7,7 +7,7 @@ on:
         description: 'Kernel Revision (ex: 3)'
         required: false
       STRINGS:
-        description: 'Kernel Strings (ex: MyKernel)'
+        description: 'Kernel Strings (ex: MyKernel, don't add any space! MyKernel ✅️, My Kernel ❌️)'
         required: true
         default: 'MyKernel'
       KERNELSU_SUPPORT:
