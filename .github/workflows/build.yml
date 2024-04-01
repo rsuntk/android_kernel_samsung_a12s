@@ -11,18 +11,29 @@ on:
         required: true
         default: 'MyKernel'
       KERNELSU_SUPPORT:
-        description: 'Add KernelSU support (y/n)'
+        description: 'Add KernelSU support'
         required: true
-        default: 'n'
+        type: boolean
       USE_PERMISSIVE:
-        description: 'Is SELinux Permissive (y/n)'
+        description: 'Is SELinux Permissive'
         required: true
-        default: 'n'
+        type: boolean
         
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Prepare environment
+      run: |
+        echo $REV
+        echo $LOCALVERSION
+        echo $KSU
+        echo $SELINUX_STATE
+      env:
+        REV: ${{ github.event.inputs.REV }}
+        LOCALVERSION: ${{ github.event.inputs.STRINGS }}
+        KSU: ${{ github.event.inputs.KERNELSU_SUPPORT }}
+        SELINUX_STATE: ${{ github.event.inputs.USE_PERMISSIVE }}
     - uses: actions/checkout@v4
       with:
         path: android_kernel_samsung_a12s
@@ -34,10 +45,6 @@ jobs:
         sudo aptitude install libssl-dev -y
     - name: Build with Clang
       run: |
-        export REV=${{ github.event.inputs.REV }}
-        export LOCALVERSION=${{ github.event.inputs.STRINGS }}
-        export KSU=${{ github.event.inputs.KERNELSU_SUPPORT }}
-        export SELINUX_STATE=${{ github.event.inputs.USE_PERMISSIVE }}
         bash $(pwd)/build_github.sh
       working-directory: android_kernel_samsung_a12s
     - name: Upload the files
