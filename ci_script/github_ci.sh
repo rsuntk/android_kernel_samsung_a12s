@@ -186,9 +186,9 @@ build_krenol() {
 		echo "";
 		
 		if [[ $KSU = 'true' ]]; then
-			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(nproc --all)
+			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)" -j$(nproc --all)
 		else
-			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(nproc --all)
+			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)" -j$(nproc --all)
 		fi
 	elif [[ $PROC_NUM -lt $MIN_PROCESSOR_CORES ]]; then
 		echo ""
@@ -196,9 +196,9 @@ build_krenol() {
 		echo "- Using 1 core.";
 		echo "";
 		if [[ $KSU = 'true' ]]; then
-			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION)
+			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)"
 		else
-			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION)
+			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)"
 		fi
 	else
 		echo ""
@@ -206,9 +206,9 @@ build_krenol() {
 		echo "- Using $MIN_PROCESSOR_CORES cores.";
 		echo "";
 		if [[ $KSU = 'true' ]]; then
-			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(echo $MIN_PROCESSOR_CORES)
+			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_KSU=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)" -j$(echo $MIN_PROCESSOR_CORES)
 		else
-			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION=-$(echo $LOCALVERSION) -j$(echo $MIN_PROCESSOR_CORES)
+			make -C $(pwd) O=$(pwd)/out KCFLAGS=-w CONFIG_SECTION_MISMATCH_WARN_ONLY=y CONFIG_LOCALVERSION="-$(echo $LOCALVERSION)" -j$(echo $MIN_PROCESSOR_CORES)
 		fi
 	fi
 
