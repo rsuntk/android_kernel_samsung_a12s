@@ -32,16 +32,11 @@ jobs:
         REV_INPUT: ${{ github.event.inputs.REV }}
         LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
       working-directory: android_kernel_samsung_a12s
-    - name: Upload to Release
-      uses: softprops/action-gh-release@v1
+    - name: Upload to Files
+      uses: actions/upload-artifact@v4
       with:
-        files: | 
+        name: Kernelfiles
+        path: | 
           android_kernel_samsung_a12s/rsuntk/*.img
           android_kernel_samsung_a12s/rsuntk/*.tar
           android_kernel_samsung_a12s/rsuntk/*.txt
-        name: ${{ github.run_id }}
-        tag_name: ${{ github.run_id }}
-        body: |
-          Device: A12s
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
