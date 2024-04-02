@@ -26,19 +26,22 @@ jobs:
     - name: Build with Clang
       run: |
         export REV=$REV_INPUT
-        export GITSHA=${{ github.event.pull_request.head.sha }}
         export LOCALVERSION=$LOCALVERSION_INPUT
         bash $(pwd)/ci_script/build_multiple.sh
       env:
         REV_INPUT: ${{ github.event.inputs.REV }}
         LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
       working-directory: android_kernel_samsung_a12s
-    - name: Upload the files
-      uses: actions/upload-artifact@v4.3.1
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
       with:
-        name: kernelfiles
-        path: |
+        files: | 
           android_kernel_samsung_a12s/rsuntk/*.img
           android_kernel_samsung_a12s/rsuntk/*.tar
-          android_kernel_samsung_a12s/rsuntk/readme.txt
-
+          android_kernel_samsung_a12s/rsuntk/*.txt
+        name: ${{ github.run_id }}
+        tag_name: ${{ github.run_id }}
+        body: |
+          Device: A12s
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
