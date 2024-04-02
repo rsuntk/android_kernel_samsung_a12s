@@ -40,6 +40,5 @@ jobs:
         path: |
           android_kernel_samsung_a12s/rsuntk/*.img
           android_kernel_samsung_a12s/rsuntk/*.tar
-          android_kernel_samsung_a12s/out/arch/arm64/boot/Image
-          android_kernel_samsung_a12s/out/arch/arm64/boot/Image.gz
+          android_kernel_samsung_a12s/rsuntk/readme.txt
 
