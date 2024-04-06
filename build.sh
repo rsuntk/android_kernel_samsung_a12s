@@ -48,6 +48,7 @@ else
 	KSU_STATE=$(cat local_config.cfg | grep -i 'KSU_STATE' | cut -d ':' -f 2 | sed 's/^[[:space:]]*//')
 	KSU_BRANCH=$(cat local_config.cfg | grep -i 'KSU_BRANCH' | cut -d ':' -f 2 | sed 's/^[[:space:]]*//')
 	REVISION=$(cat local_config.cfg | grep -i 'REVISION' | cut -d ':' -f 2 | sed 's/^[[:space:]]*//')
+	BOOT_TARGET=$(cat local_config.cfg | grep -i 'BOOT_REGION' | cut -d ':' -f 2 | sed 's/^[[:space:]]*//')
 	REV=$REVISION
 	if [ -z $REV ]; then
 		KERNEL_REV_OR_ID=$(./rsuntk/bin/random6);
@@ -88,7 +89,11 @@ else
 fi
 # global variable
 export DEFCONFIG="rsuntk_defconfig"
-export BINARY="A127FXXSADWK2"
+if [[ $BOOT_TARGET = "latam" ]]; then
+	export BINARY="A127MUBUBDWK2"
+else
+	export BINARY="A127FXXSADWK2"
+fi
 export ARCH=arm64
 export ANDROID_MAJOR_VERSION=t
 export PLATFORM_VERSION=13
@@ -123,6 +128,7 @@ print_summary() {
 		echo "KSU_BRANCH: $KSU_BRANCH"
 	fi
 	echo "SELINUX: $REAL_STATE"
+	echo "BINARY: $BINARY"
 	echo "";
 }
 print_summary;
@@ -178,6 +184,9 @@ if [ -f $MAKE_SH ]; then
 	fi
 	echo "Build state: $BUILD_STATE"
 	if [[ $BUILD_STATE = '0' ]]; then
+		if [[ $GIT_UPLOAD_GZ = "true" ]]; then
+			mv $OUTDIR/arch/arm64/boot/Image.gz $RSUDIR/Image.gz
+		fi
 		echo "- Build completed. Creating boot.img"
 		make_boot;
 	else
