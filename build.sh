@@ -73,6 +73,7 @@ else
 		KSU_GIT_COMMIT=$(cd KernelSU && git rev-list --count HEAD)
 		KSU_NUMBER=$(expr 10000 + $KSU_GIT_COMMIT + 200)
 		FLAGS="CONFIG_KSU=y"
+		LAST_FIELD="release";
 		FMT="`echo $KERNEL_STRINGS`-`echo $KERNEL_REV_OR_ID`-ksu-`echo $KSU_NUMBER`_`echo $LAST_FIELD`"
 	else
 		LAST_FIELD="release";
