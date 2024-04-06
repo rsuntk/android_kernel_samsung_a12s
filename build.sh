@@ -188,7 +188,7 @@ if [ -f $MAKE_SH ]; then
 	echo "Build state: $BUILD_STATE"
 	if [[ $BUILD_STATE = '0' ]]; then
 		if [[ $GIT_UPLOAD_GZ = "true" ]]; then
-			mv $OUTDIR/arch/arm64/boot/Image.gz $RSUDIR/Image.gz
+			mv $OUTDIR/arch/arm64/boot/Image.gz $RSUPATH/Image.gz
 		fi
 		echo "- Build completed. Creating boot.img"
 		make_boot;
