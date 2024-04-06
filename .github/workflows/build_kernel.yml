@@ -10,6 +10,14 @@ on:
         description: 'Kernel Strings (example: MyKernel)'
         required: true
         default: 'MyKernel'
+      BOOT_TARGET:
+        description: 'Stock boot.img region'
+        required: true
+        default: global
+        type: choice
+        options:
+        - global
+        - latam
       KERNELSU_BRANCH:
         description: 'KernelSU branch (ignore if no ksu)'
         required: true
@@ -24,6 +32,10 @@ on:
         type: boolean
       USE_PERMISSIVE:
         description: 'SELinux Permissive'
+        required: true
+        type: boolean
+      UPLOAD_IMAGE_GZ:
+        description: 'Upload Image.gz file'
         required: true
         type: boolean
         
@@ -47,14 +59,18 @@ jobs:
         export GIT_LOCALVERSION=$LOCALVERSION_INPUT
         export KSU_BRANCH=$KERNELSU_BRANCH_INPUT
         export KSU_STATE=$KERNELSU_STATE_INPUT
+        export BOOT_TARGET=$BOOT_IMG_TARGET
+        export GIT_UPLOAD_GZ=$UPLOAD_IMAGE_GZ
         export SELINUX_STATE=$SELINUX_STATE_INPUT
         bash $(pwd)/build.sh
       env:
         REV_INPUT: ${{ github.event.inputs.REV }}
         LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
+        BOOT_IMG_TARGET: ${{ github.event.inputs.BOOT_TARGET }}
         KERNELSU_BRANCH_INPUT: ${{ github.event.inputs.KERNELSU_BRANCH }}
         KERNELSU_STATE_INPUT: ${{ github.event.inputs.KERNELSU_SUPPORT }}
         SELINUX_STATE_INPUT: ${{ github.event.inputs.USE_PERMISSIVE }}
+        UPLOAD_IMAGE_GZ: ${{ github.event.inputs.UPLOAD_IMAGE_GZ }}
       working-directory: android_kernel_samsung_a12s
     - name: Upload the files
       uses: actions/upload-artifact@v4.3.1
