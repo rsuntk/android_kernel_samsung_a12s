@@ -17,11 +17,6 @@ if [[ $IS_CI = "y" ]]; then
 	TAGS=$(git describe --tags --always)
 	LAST_FIELD=$TAGS
 	if [[ $KSU_STATE = "true" ]]; then
-		FMT="`echo $KERNEL_STRINGS`-`echo $KERNEL_REV_OR_ID`-ksu-`echo $KSU_NUMBER`_`echo $LAST_FIELD`"
-	else
-		FMT="`echo $KERNEL_STRINGS`-`echo $KERNEL_REV_OR_ID`_`echo $LAST_FIELD`"
-	fi
-	if [[ $KSU_STATE = "true" ]]; then
 		rm $(pwd)/KernelSU
 		if [[ $KSU_BRANCH = "dev" ]]; then
 			curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
@@ -31,6 +26,11 @@ if [[ $IS_CI = "y" ]]; then
 		VERSION_TAGS=$(cd KernelSU && git describe --tags)
 		KSU_GIT_COMMIT=$(cd KernelSU && git rev-list --count HEAD)
 		KSU_NUMBER=$(expr 10000 + $KSU_GIT_COMMIT + 200)
+		if [[ $KSU_STATE = "true" ]]; then
+			FMT="`echo $KERNEL_STRINGS`-`echo $KERNEL_REV_OR_ID`-ksu-`echo $KSU_NUMBER`_`echo $LAST_FIELD`"
+		else
+			FMT="`echo $KERNEL_STRINGS`-`echo $KERNEL_REV_OR_ID`_`echo $LAST_FIELD`"
+		fi
 		FLAGS="CONFIG_KSU=y"
 	fi
 	if [[ $SELINUX_STATE = "true" ]]; then
