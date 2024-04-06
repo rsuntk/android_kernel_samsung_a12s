@@ -129,6 +129,9 @@ print_summary() {
 	fi
 	echo "SELINUX: $REAL_STATE"
 	echo "BINARY: $BINARY"
+	if [[ $IS_CI = "y" ]]; then
+		echo "UPLOAD_GZ: $GIT_UPLOAD_GZ"
+	fi
 	echo "";
 }
 print_summary;
