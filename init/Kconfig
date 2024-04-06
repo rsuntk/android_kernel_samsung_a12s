@@ -103,6 +103,7 @@ config COMPILE_TEST
 
 config LOCALVERSION
 	string "Local version - append to kernel release"
+	default "-$(KERNEL_STRINGS)"
 	help
 	  Append an extra string to the end of your kernel version.
 	  This will show up when you type uname, for example.
@@ -113,7 +114,7 @@ config LOCALVERSION
 
 config LOCALVERSION_AUTO
 	bool "Automatically append version information to the version string"
-	default y
+	default n
 	depends on !COMPILE_TEST
 	help
 	  This will try to automatically determine if the current tree is a

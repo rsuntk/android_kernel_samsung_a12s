@@ -16,17 +16,26 @@ There's 2 method available here: CI (Github Action) and Manual build
 git clone https://github.com/rsuntk/android_kernel_samsung_a12s.git a12s_kernel && cd a12s_kernel
 ```
 
-2. Edit the REV & LOCALVERSION
-```sh
-REV = REVISION, will appear in /proc/version, if emptied, a random 40 strings generator will appear in /proc/version as an 'id' not 'rev'
+2. Edit ```local_config.cfg```
+The local_config.cfg file looks like this:
+```
+# Local Configuration
+# only use lowercase!
 
-LOCALVERSION = the kernel strings that will appear at Linux Version, example '4.19.150-TragicHorizon'. The TragicHorizon is the kernel strings.
+# Booleans
+PERMISSIVE: true
+KSU_STATE: false
+
+# Strings
+#
+# Available ksu_branch: stable and dev
+#
+REVISION: 3
+KSU_BRANCH: stable
+KERNEL_NAME: TragicHorizon
 ```
 
-3. Edit the `arch/arm64/configs/rsuntk_defconfig`
-This is optional, but you can add `CONFIG_KSU=y` to enable KernelSU
-
-4. Open the terminal and type:
+3. Open the terminal and type:
 ```sh
 bash build.sh
 ```

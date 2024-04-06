@@ -6,7 +6,7 @@ ARCH=$2
 SMP=$3
 PREEMPT=$4
 CC=$5
-
+RSU="(kernel by @rsuntk/Rissu), (ksu: $KSU_VER_STRINGS_STATE), (part of rissu kernel project)"
 vecho() { [ "${quiet}" = "silent_" ] || echo "$@" ; }
 
 # If compile.h exists already and we don't own autoconf.h

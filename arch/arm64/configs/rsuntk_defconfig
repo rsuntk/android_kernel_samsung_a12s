@@ -22,9 +22,8 @@ CONFIG_THREAD_INFO_IN_TASK=y
 #
 CONFIG_INIT_ENV_ARG_LIMIT=32
 # CONFIG_COMPILE_TEST is not set
-# CONFIG_LOCALVERSION_AUTO is not set
 CONFIG_BUILD_SALT=""
-CONFIG_DEFAULT_HOSTNAME="(none)"
+CONFIG_DEFAULT_HOSTNAME="rissu"
 CONFIG_SWAP=y
 # CONFIG_SYSVIPC is not set
 # CONFIG_POSIX_MQUEUE is not set
@@ -36,19 +35,6 @@ CONFIG_AUDITSYSCALL=y
 CONFIG_AUDIT_WATCH=y
 CONFIG_AUDIT_TREE=y
 
-#
-# KernelSU configs
-#
-# CONFIG_KSU is enable KSU feature in this kernel.
-# CONFIG_OVERLAY_FS is required for KSU Modules support.
-# 
-# * Some device has broken KPROBES, so we recommend it to disabled it.
-# * Manual method is recommended.
-#
-# * Also please don't implement KSU using both KPROBE and Manual method,
-# * It will cause KSU to always run in safe-mode.
-#
-# CONFIG_KSU is not set
 # CONFIG_SUSFS is not set
 CONFIG_OVERLAY_FS=y
 # CONFIG_KSU_DEBUG is not set
