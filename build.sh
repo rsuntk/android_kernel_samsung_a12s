@@ -4,13 +4,15 @@
 # Unified script for CI and Local Build.
 # Contributor: Rissu <farisjihadih@outlook.com>
 
+# TODO: Trying to remove duplicated function.
+
 # ci related
-chmod +x $(pwd)/rsuntk/bin/random6
+chmod +x $(pwd)/Rissu/bin/random6
 if [[ $IS_CI = "y" ]]; then
 	export KERNEL_STRINGS="$GIT_LOCALVERSION"
 	REV="$GIT_REVISION"
 	if [ -z $REV ]; then
-		KERNEL_REV_OR_ID=$(./rsuntk/bin/random6);
+		KERNEL_REV_OR_ID=$(./Rissu/bin/random6);
 	else
 		KERNEL_REV_OR_ID="r`echo $REV`"
 	fi
@@ -51,7 +53,7 @@ else
 	BOOT_TARGET=$(cat local_config.cfg | grep -i 'BOOT_REGION' | cut -d ':' -f 2 | sed 's/^[[:space:]]*//')
 	REV=$REVISION
 	if [ -z $REV ]; then
-		KERNEL_REV_OR_ID=$(./rsuntk/bin/random6);
+		KERNEL_REV_OR_ID=$(./Rissu/bin/random6);
 	else
 		KERNEL_REV_OR_ID="r`echo $REV`"
 	fi
@@ -97,7 +99,7 @@ fi
 export ARCH=arm64
 export ANDROID_MAJOR_VERSION=t
 export PLATFORM_VERSION=13
-export RSUPATH="$(pwd)/rsuntk"
+export RSUPATH="$(pwd)/Rissu"
 export MGSKBOOT="$RSUPATH/bin/magiskboot"
 export GEN_RANDOM="$RSUPATH/bin/random"
 export OEMBOOT="$RSUPATH/`echo $BINARY`.tar.xz"
@@ -121,17 +123,19 @@ fi
 chmod +x $MGSKBOOT
 chmod +x $GEN_RANDOM
 print_summary() {
-	echo "===== Summary =====";
-	echo "STRINGS: $KERNEL_STRINGS";
+	echo "";
+	echo "|-------------- Summary --------------|";
+	echo "| NAME: $KERNEL_STRINGS";
 	if [[ $KSU_STATE = "true" ]]; then
-		echo "KERNELSU: $KSU_STATE"
-		echo "KSU_BRANCH: $KSU_BRANCH"
+		echo "| KSU_SUPPORT: $KSU_STATE"
+		echo "| KSU_BRANCH: $KSU_BRANCH"
 	fi
-	echo "SELINUX: $REAL_STATE"
-	echo "BINARY: $BINARY"
+	echo "| SELINUX: $REAL_STATE"
+	echo "| BINARY: $BINARY"
 	if [[ $IS_CI = "y" ]]; then
-		echo "UPLOAD_GZ: $GIT_UPLOAD_GZ"
+		echo "| UPLOAD_GZ: $GIT_UPLOAD_GZ"
 	fi
+	echo "|-------------- Summary --------------|";
 	echo "";
 }
 print_summary;
@@ -143,12 +147,14 @@ make_boot() {
 	cd $RSUPATH
 	cat $RSUPATH/art.txt
 	tar -xf $OEMBOOT -C $RSUPATH
+	#make unpack_boot <- Rissu/Makefile
 	echo "";
 	echo "- Unpacking boot"
 	$MGSKBOOT unpack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/kernel
 	cp $OUTDIR/arch/$ARCH/boot/Image $RSUPATH/kernel
 	echo "- Repacking boot"
+	#make repack_boot <- Rissu/Makefile
 	$MGSKBOOT repack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/boot.img
 	mv $RSUPATH/new-boot.img $RSUPATH/boot.img
@@ -160,6 +166,7 @@ make_boot() {
 	echo "- Creating boot file"
 	echo "- Done!"
 	echo "- Cleaning files"
+	#make clean <- Rissu/Makefile
 	mv $RSUPATH/boot.img $RSUPATH/$BOOT_FMT
 	rm $RSUPATH/kernel && rm $RSUPATH/dtb
 	if [ -f $RSUPATH/ramdisk.cpio ]; then
