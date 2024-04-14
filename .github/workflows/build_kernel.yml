@@ -77,7 +77,7 @@ jobs:
       with:
         name: kernel_files
         path: |
-          android_kernel_samsung_a12s/rsuntk/*.img
-          android_kernel_samsung_a12s/rsuntk/*.tar
-          android_kernel_samsung_a12s/rsuntk/*.gz
-          android_kernel_samsung_a12s/rsuntk/*.md
+          android_kernel_samsung_a12s/Rissu/*.img
+          android_kernel_samsung_a12s/Rissu/*.tar
+          android_kernel_samsung_a12s/Rissu/*.gz
+          android_kernel_samsung_a12s/Rissu/*.md
