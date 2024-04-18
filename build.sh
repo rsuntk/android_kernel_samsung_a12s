@@ -217,6 +217,7 @@ chmod +x $GEN_RANDOM
 
 if [[ $ENV_IS_CI = 'true' ]]; then
 summary() {
+	pre_build_stage;
 	clear
 	echo "";
 	echo " ##########################################"
@@ -233,10 +234,6 @@ summary() {
 	echo "- Build started at `date`"
 }
 summary;
-fi
-
-if [[ $ENV_IS_CI = 'true' ]]; then
-	pre_build_stage;
 else
 	make_a_config;
 fi
