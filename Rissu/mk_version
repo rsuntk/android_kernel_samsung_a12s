@@ -1,5 +1,11 @@
 #! /usr/bin/env bash
 cd $RSUPATH
+if [[ $KSU_STATE = "true" ]]; then
+	KSU_ANYKERNEL3=$KSU_VERSION_NUMBER
+else
+	KSU_ANYKERNEL3="-"
+fi
+
 BORDER="-------------------------------------------------"
 printf "
 $BORDER
@@ -7,7 +13,7 @@ Name	:	$KERNEL_STRINGS
 $BORDER
 Rev	:	$REV
 $BORDER
-KSU	:	$KSU_VERSION_NUMBER
+KSU	:	$KSU_ANYKERNEL3
 $BORDER
 SELinux	:	$REAL_STATE
 $BORDER" > AnyKernel3/version

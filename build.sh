@@ -126,11 +126,11 @@ DATE=$(date +'%Y%m%d%H%M%S')
 
 pre_build_stage() {
 	if [[ $ENV_IS_CI = 'true' ]]; then
-		KERNEL_STRINGS="$CI_ENV_LOCALVERSION"
+		export KERNEL_STRINGS="$CI_ENV_LOCALVERSION"
 		if [ ! -z $CI_ENV_REVISION ]; then
-			REV="r`echo $CI_ENV_REVISION`"
+			export REV="r`echo $CI_ENV_REVISION`"
 		else
-			REV="`echo $DATE`"
+			export REV="`echo $DATE`"
 		fi
 	fi
 	
