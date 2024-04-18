@@ -68,7 +68,7 @@ jobs:
         export SELINUX_STATE=$SELINUX_STATE_INPUT
         bash $(pwd)/build.sh
         zipName=`ls Rissu/*.zip | awk -F '(/|.zip)' '{print $2}'` && echo "::set-output name=zipName::$zipName"
-        imgtarxzName=`ls Rissu/*.img | awk -F '(/|.img.tar.xz)' '{print $2}'` && echo "::set-output name=imgtarName::$imgtarxzName"
+        imgtarxzName=`ls Rissu/*.img.tar.xz | awk -F '(/|.img.tar.xz)' '{print $2}'` && echo "::set-output name=imgtarName::$imgtarxzName"
       env:
         REV_INPUT: ${{ github.event.inputs.REV }}
         LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
