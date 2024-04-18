@@ -243,7 +243,7 @@ fi
 
 printf "#! /usr/bin/env bash
 # Temporary make commands!
-make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $DEFCONFIG` > $RSUPATH/.tmp.log 
+make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $DEFCONFIG`
 make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $THREADCOUNT`" > make_cmd.sh
 
 make_boot() {
@@ -252,15 +252,15 @@ make_boot() {
 	tar -xf $OEMBOOT -C $RSUPATH
 	echo "";
 	echo "- Unpacking boot"
-	$MGSKBOOT unpack $RSUPATH/boot.img > $RSUDIR/.tmp.log
+	$MGSKBOOT unpack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/kernel
 	cp $OUTDIR/arch/$ARCH/boot/Image $RSUPATH/kernel
 	echo "- Repacking boot"
-	$MGSKBOOT repack $RSUPATH/boot.img 2 > $RSUDIR/.tmp.log
+	$MGSKBOOT repack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/boot.img
 	mv $RSUPATH/new-boot.img $RSUPATH/boot.img
 	echo "- Compressing with lz4"
-	lz4 -B6 --content-size boot.img boot.img.lz4 > $RSUDIR/.tmp.log
+	lz4 -B6 --content-size boot.img boot.img.lz4 2>/dev/null
 	echo "- Creating tarball file"
 	tar -cf $TAR_FMT boot.img.lz4
 	rm $RSUPATH/boot.img.lz4
