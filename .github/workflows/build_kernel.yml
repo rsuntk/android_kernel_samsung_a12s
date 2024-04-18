@@ -1,5 +1,4 @@
 name: Build Kernel
-
 on:
   workflow_dispatch:
     inputs:
@@ -57,6 +56,7 @@ jobs:
         git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-gnu.git gnu
       working-directory: android_kernel_samsung_a12s
     - name: Build
+      id: buildKernel
       run: |
         export ENV_IS_CI="true"
         export CI_ENV_REVISION=$REV_INPUT
@@ -67,6 +67,8 @@ jobs:
         export GIT_UPLOAD_UNCOMPRESSED_BOOT_IMG=$UPLOAD_UNCOMPRESSED_BOOT_IMG
         export SELINUX_STATE=$SELINUX_STATE_INPUT
         bash $(pwd)/build.sh
+        zipName=`ls Rissu/*.zip | awk -F '(/|.zip)' '{print $2}'` && echo "::set-output name=zipName::$zipName"
+        imgtarxzName=`ls Rissu/*.img | awk -F '(/|.img.tar.xz)' '{print $2}'` && echo "::set-output name=imgtarName::$imgtarxzName"
       env:
         REV_INPUT: ${{ github.event.inputs.REV }}
         LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
@@ -76,13 +78,30 @@ jobs:
         UPLOAD_IMAGE_GZ: ${{ github.event.inputs.UPLOAD_IMAGE_GZ }}
         UPLOAD_UNCOMPRESSED_BOOT_IMG: ${{ github.event.inputs.UPLOAD_UNCOMPRESSED_BOOT_IMG }}
       working-directory: android_kernel_samsung_a12s
-    - name: Upload the files
+    - name: Upload .tar.xz
       uses: actions/upload-artifact@v4.3.1
       with:
-        name: kernel_files
-        path: |
-          android_kernel_samsung_a12s/Rissu/*.img
-          android_kernel_samsung_a12s/Rissu/*.tar
-          android_kernel_samsung_a12s/Rissu/*.gz
-          android_kernel_samsung_a12s/Rissu/*.tar.xz
-          android_kernel_samsung_a12s/Rissu/*.md
+        name: ${{ steps.buildKernel.outputs.imgtarxzName }}
+        path: android_kernel_samsung_a12s/Rissu/*.tar.xz
+    - name: Upload .img
+      if: env.UPLOAD_UNCOMPRESSED_BOOT_IMG == true
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: ${{ steps.buildKernel.outputs.imgtarxzName }}
+        path: android_kernel_samsung_a12s/Rissu/*.img
+    - name: Upload zip
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: ${{ steps.buildKernel.outputs.zipName }}
+        path: android_kernel_samsung_a12s/Rissu/AnyKernel3/*
+    - name: Upload .gz
+      if: env.UPLOAD_IMAGE_GZ == true
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: Image
+        path: android_kernel_samsung_a12s/Rissu/*.gz
+    - name: Upload NOTICE
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: NOTICE
+        path: android_kernel_samsung_a12s/Rissu/*.md

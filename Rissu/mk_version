@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+cd $RSUPATH
+BORDER="-------------------------------------------------"
+printf "
+$BORDER
+Name	:	$KERNEL_STRINGS
+$BORDER
+Rev	:	$REV
+$BORDER
+KSU	:	$KSU_VERSION_NUMBER
+$BORDER
+SELinux	:	$REAL_STATE
+$BORDER" > AnyKernel3/version

@@ -143,9 +143,9 @@ pre_build_stage() {
 				curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 			fi
 		fi
-		KSU_VERSION_TAGS=$(cd KernelSU && git describe --tags)
-		KSU_COMMIT_COUNT=$(cd KernelSU && git rev-list --count HEAD)
-		KSU_VERSION_NUMBER=$(expr 10000 + $KSU_COMMIT_COUNT + 200)
+		export KSU_VERSION_TAGS=$(cd KernelSU && git describe --tags)
+		export KSU_COMMIT_COUNT=$(cd KernelSU && git rev-list --count HEAD)
+		export KSU_VERSION_NUMBER=$(expr 10000 + $KSU_COMMIT_COUNT + 200)
 		
 		FMT="`echo $KERNEL_STRINGS`-`echo $REV`-ksu-`echo $KSU_VERSION_NUMBER`_`echo $KSU_VERSION_TAGS`"
 		
@@ -157,14 +157,15 @@ pre_build_stage() {
 	# fixup! Fix ci upload filename
 	TAR_FMT="$FMT.tar"
 	BOOT_FMT="$FMT.img"
+	ANYKERNEL3_FMT="`echo $FMT`_AnyKernel3.zip"
 
 	## SELINUX
 	if [[ $SELINUX_STATE = "true" ]]; then
-		REAL_STATE="Permissive"
+		export REAL_STATE="Permissive"
 		export PERM_FLAGS="y"
 		export ENF_FLAGS="n"
 	else
-		REAL_STATE="Enforcing"
+		export REAL_STATE="Enforcing"
 		export PERM_FLAGS="n"
 		export ENF_FLAGS="y"
 	fi
@@ -205,6 +206,7 @@ OUTDIR="$(pwd)/out"
 MIN_CORES="2"
 CORES=$(nproc --all)
 MAKE_SH="$(pwd)/make_cmd.sh"
+ANYKERNEL3="$RSUPATH/AnyKernel3"
 
 if [ $CORES -gt $MIN_CORES ]; then
 	THREADCOUNT="-j`echo $CORES`"
@@ -255,6 +257,10 @@ make_boot() {
 	$MGSKBOOT unpack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/kernel
 	cp $OUTDIR/arch/$ARCH/boot/Image $RSUPATH/kernel
+	echo "- Creating AnyKernel3"
+	bash $RSUPATH/mk_version
+	cp $OUTDIR/arch/$ARCH/boot/Image $ANYKERNEL3
+	zip -r $RSUPATH/$ANYKERNEL3_FMT $ANYKERNEL3
 	echo "- Repacking boot"
 	$MGSKBOOT repack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/boot.img
