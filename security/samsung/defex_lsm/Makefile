@@ -2,6 +2,9 @@
 # Makefile for the Defex
 #
 
+# fixup! Remove truncation warning while compiling pack_rules.c
+HOST_EXTRACFLAGS := -Wno-stringop-truncation
+
 # Features to Enable
 PED_ENABLE=true
 SAFEPLACE_ENABLE=true
