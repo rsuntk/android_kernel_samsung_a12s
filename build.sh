@@ -154,6 +154,10 @@ pre_build_stage() {
 		FMT="`echo $KERNEL_STRINGS`-`echo $REV`_`echo $DATE`"
 	fi
 	
+	# fixup! Fix ci upload filename
+	TAR_FMT="$FMT.tar"
+	BOOT_FMT="$FMT.img"
+
 	## SELINUX
 	if [[ $SELINUX_STATE = "true" ]]; then
 		REAL_STATE="Permissive"
@@ -194,15 +198,13 @@ fi
 # FMT
 export MGSKBOOT="$RSUPATH/bin/magiskboot"
 export GEN_RANDOM="$RSUPATH/bin/random"
-export OEMBOOT="$RSUPATH/stockboot.tar.xz"
+export OEMBOOT="$RSUPATH/data/stockboot.tar.xz"
 
 # local variable
 OUTDIR="$(pwd)/out"
 MIN_CORES="2"
 CORES=$(nproc --all)
 MAKE_SH="$(pwd)/make_cmd.sh"
-TAR_FMT="$FMT.tar"
-BOOT_FMT="$FMT.img"
 
 if [ $CORES -gt $MIN_CORES ]; then
 	THREADCOUNT="-j`echo $CORES`"
@@ -229,6 +231,7 @@ summary() {
 	fi
 	echo " # SELinux Permissive: $SELINUX_STATE"
 	echo " # Upload Gz: $GIT_UPLOAD_GZ"
+	echo " # Upload img: $GIT_UPLOAD_UNCOMPRESSED_BOOT_IMG"
 	echo " #########################################"
 	echo "";
 	echo "- Build started at `date`"
@@ -240,7 +243,7 @@ fi
 
 printf "#! /usr/bin/env bash
 # Temporary make commands!
-make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $DEFCONFIG` 
+make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $DEFCONFIG` > $RSUPATH/.tmp.log 
 make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $THREADCOUNT`" > make_cmd.sh
 
 make_boot() {
@@ -249,22 +252,28 @@ make_boot() {
 	tar -xf $OEMBOOT -C $RSUPATH
 	echo "";
 	echo "- Unpacking boot"
-	$MGSKBOOT unpack $RSUPATH/boot.img 2>/dev/null
+	$MGSKBOOT unpack $RSUPATH/boot.img > $RSUDIR/.tmp.log
 	rm $RSUPATH/kernel
 	cp $OUTDIR/arch/$ARCH/boot/Image $RSUPATH/kernel
 	echo "- Repacking boot"
-	$MGSKBOOT repack $RSUPATH/boot.img 2>/dev/null
+	$MGSKBOOT repack $RSUPATH/boot.img 2 > $RSUDIR/.tmp.log
 	rm $RSUPATH/boot.img
 	mv $RSUPATH/new-boot.img $RSUPATH/boot.img
 	echo "- Compressing with lz4"
-	lz4 -B6 --content-size boot.img boot.img.lz4 > /dev/null
+	lz4 -B6 --content-size boot.img boot.img.lz4 > $RSUDIR/.tmp.log
 	echo "- Creating tarball file"
 	tar -cf $TAR_FMT boot.img.lz4
 	rm $RSUPATH/boot.img.lz4
 	echo "- Creating boot file"
+	echo "- Compressing boot file"
+	tar -cJf - boot.img | xz -9e -c - > $BOOT_FMT.tar.xz
 	echo "- Done!"
 	echo "- Cleaning files"
-	mv $RSUPATH/boot.img $RSUPATH/$BOOT_FMT
+	if [[ $GIT_UPLOAD_UNCOMPRESSED_BOOT_IMG = "true" ]]; then
+		mv $RSUPATH/boot.img $RSUPATH/$BOOT_FMT
+	else
+		rm $RSUPATH/boot.img
+	fi
 	rm $RSUPATH/kernel && rm $RSUPATH/dtb
 	if [ -f $RSUPATH/ramdisk.cpio ]; then
 		rm $RSUPATH/ramdisk.cpio

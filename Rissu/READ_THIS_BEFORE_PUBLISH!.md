@@ -3,6 +3,8 @@ LICENSE
 Rissu Project (C) 2024
 kernel and ci: @RissuDesu
 
+Anyway, you need to know, what you should do with *.img.tar.xz!
+
 I. How to install the kernel:
 - For img file:
 	1. Boot to twrp,
@@ -10,6 +12,14 @@ I. How to install the kernel:
 	3. Click Install Image
 	4. Flash the img file
 	5. Reboot
+
+- For img.tar.xz file:
+	1. UNPACK IT FIRST.
+	2. Boot to twrp,
+	3. Go to Install menu,
+	4. Click install image,
+	5. Flash the img file,
+	6. Reboot
 
 - For tar file:
 	1. Boot to download mode.

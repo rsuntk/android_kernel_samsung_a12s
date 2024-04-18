@@ -27,7 +27,11 @@ on:
         required: true
         type: boolean
       UPLOAD_IMAGE_GZ:
-        description: 'Upload Image.gz file'
+        description: 'Upload Image.gz file (increase size!)'
+        required: true
+        type: boolean
+      UPLOAD_UNCOMPRESSED_BOOT_IMG:
+        description: 'Upload uncompressed boot.img (increase size!)'
         required: true
         type: boolean
         
@@ -60,6 +64,7 @@ jobs:
         export KSU_BRANCH=$KERNELSU_BRANCH_INPUT
         export KSU_STATE=$KERNELSU_STATE_INPUT
         export GIT_UPLOAD_GZ=$UPLOAD_IMAGE_GZ
+        export GIT_UPLOAD_UNCOMPRESSED_BOOT_IMG=$UPLOAD_UNCOMPRESSED_BOOT_IMG
         export SELINUX_STATE=$SELINUX_STATE_INPUT
         bash $(pwd)/build.sh
       env:
@@ -69,6 +74,7 @@ jobs:
         KERNELSU_STATE_INPUT: ${{ github.event.inputs.KERNELSU_SUPPORT }}
         SELINUX_STATE_INPUT: ${{ github.event.inputs.USE_PERMISSIVE }}
         UPLOAD_IMAGE_GZ: ${{ github.event.inputs.UPLOAD_IMAGE_GZ }}
+        UPLOAD_UNCOMPRESSED_BOOT_IMG: ${{ github.event.inputs.UPLOAD_UNCOMPRESSED_BOOT_IMG }}
       working-directory: android_kernel_samsung_a12s
     - name: Upload the files
       uses: actions/upload-artifact@v4.3.1
@@ -78,4 +84,5 @@ jobs:
           android_kernel_samsung_a12s/Rissu/*.img
           android_kernel_samsung_a12s/Rissu/*.tar
           android_kernel_samsung_a12s/Rissu/*.gz
+          android_kernel_samsung_a12s/Rissu/*.tar.xz
           android_kernel_samsung_a12s/Rissu/*.md
