@@ -1,0 +1,81 @@
+name: Build Kernel
+
+on:
+  workflow_dispatch:
+    inputs:
+      REV:
+        description: 'Kernel Revision [int]'
+        required: false
+      STRINGS:
+        description: 'Kernel Strings [string]'
+        required: true
+        default: 'MyKernel'
+      KERNELSU_BRANCH:
+        description: 'KernelSU branch [ignore if no ksu]'
+        required: true
+        default: stable
+        type: choice
+        options:
+        - stable
+        - dev
+      KERNELSU_SUPPORT:
+        description: 'KernelSU support'
+        required: true
+        type: boolean
+      USE_PERMISSIVE:
+        description: 'SELinux Permissive'
+        required: true
+        type: boolean
+      UPLOAD_IMAGE_GZ:
+        description: 'Upload Image.gz file'
+        required: true
+        type: boolean
+        
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: android_kernel_samsung_a12s
+        fetch-depth: 0
+    - name: Prepare dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl curl lz4 -y
+        sudo aptitude install libssl-dev -y
+    - name: Fetch toolchains
+      run: |
+        mkdir toolchains
+        cd toolchains
+        git clone https://gitlab.com/Rissu-Projekt/toolchains/clang-toolchains.git clang
+        git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-android.git google
+        git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-gnu.git gnu
+      working-directory: android_kernel_samsung_a12s
+    - name: Build
+      run: |
+        export ENV_IS_CI="true"
+        export CI_ENV_REVISION=$REV_INPUT
+        export CI_ENV_LOCALVERSION=$LOCALVERSION_INPUT
+        export KSU_BRANCH=$KERNELSU_BRANCH_INPUT
+        export KSU_STATE=$KERNELSU_STATE_INPUT
+        export GIT_UPLOAD_GZ=$UPLOAD_IMAGE_GZ
+        export SELINUX_STATE=$SELINUX_STATE_INPUT
+        bash $(pwd)/build.sh
+      env:
+        REV_INPUT: ${{ github.event.inputs.REV }}
+        LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
+        KERNELSU_BRANCH_INPUT: ${{ github.event.inputs.KERNELSU_BRANCH }}
+        KERNELSU_STATE_INPUT: ${{ github.event.inputs.KERNELSU_SUPPORT }}
+        SELINUX_STATE_INPUT: ${{ github.event.inputs.USE_PERMISSIVE }}
+        UPLOAD_IMAGE_GZ: ${{ github.event.inputs.UPLOAD_IMAGE_GZ }}
+      working-directory: android_kernel_samsung_a12s
+    - name: Upload the files
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: kernel_files
+        path: |
+          android_kernel_samsung_a12s/Rissu/*.img
+          android_kernel_samsung_a12s/Rissu/*.tar
+          android_kernel_samsung_a12s/Rissu/*.gz
+          android_kernel_samsung_a12s/Rissu/*.md
