@@ -55,7 +55,7 @@ jobs:
         git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-android.git google
         git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-gnu.git gnu
       working-directory: android_kernel_samsung_a12s
-    - name: Build
+    - name: Build kernel
       id: buildKernel
       run: |
         export ENV_IS_CI="true"
@@ -67,8 +67,8 @@ jobs:
         export GIT_UPLOAD_UNCOMPRESSED_BOOT_IMG=$UPLOAD_UNCOMPRESSED_BOOT_IMG
         export SELINUX_STATE=$SELINUX_STATE_INPUT
         bash $(pwd)/build.sh
-        zipName=`ls Rissu/*.zip | awk -F '(/|.zip)' '{print $2}'` && echo "::set-output name=zipName::$zipName"
-        imgtarxzName=`ls Rissu/*.img.tar.xz | awk -F '(/|.img.tar.xz)' '{print $2}'` && echo "::set-output name=imgtarxzName::$imgtarxzName"
+        zipName=`cat $(pwd)/zipfile_format.txt` && echo "zipName=$zipName" >> $GITHUB_OUTPUT
+        imgName=`cat $(pwd)/file_format.txt` && echo "imgName=$imgName" >> $GITHUB_OUTPUT
       env:
         REV_INPUT: ${{ github.event.inputs.REV }}
         LOCALVERSION_INPUT: ${{ github.event.inputs.STRINGS }}
@@ -81,13 +81,13 @@ jobs:
     - name: Upload .tar.xz
       uses: actions/upload-artifact@v4.3.1
       with:
-        name: ${{ steps.buildKernel.outputs.imgtarxzName }}
+        name: ${{ steps.buildKernel.outputs.imgName }}
         path: android_kernel_samsung_a12s/Rissu/*.tar.xz
     - name: Upload .img
       if: env.UPLOAD_UNCOMPRESSED_BOOT_IMG == true
       uses: actions/upload-artifact@v4.3.1
       with:
-        name: ${{ steps.buildKernel.outputs.imgtarxzName }}
+        name: ${{ steps.buildKernel.outputs.imgName }}
         path: android_kernel_samsung_a12s/Rissu/*.img
     - name: Upload zip
       uses: actions/upload-artifact@v4.3.1

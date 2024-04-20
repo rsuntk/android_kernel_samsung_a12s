@@ -1,10 +1,11 @@
 #! /usr/bin/env bash
 
 # Rissu Project (C) 2024
-# Scirpt for CI and partial for Local Build.
+# Script for CI and partial for Local Build.
 # Contributor: Rissu <farisjihadih@outlook.com>
 
 export RSUPATH="$(pwd)/Rissu"
+
 make_a_config() {
 	RAND="$RSUPATH/bin/random6"
 	chmod +x $RAND
@@ -127,11 +128,23 @@ DATE=$(date +'%Y%m%d%H%M%S')
 pre_build_stage() {
 	if [[ $ENV_IS_CI = 'true' ]]; then
 		export KERNEL_STRINGS="$CI_ENV_LOCALVERSION"
+		PRE_REV="${CI_ENV_REVISION//[^0-9]/}"
 		if [ ! -z $CI_ENV_REVISION ]; then
-			export REV="r`echo $CI_ENV_REVISION`"
+			export REV="r`echo $PRE_REV`"
 		else
 			export REV="`echo $DATE`"
 		fi
+	fi
+	
+	## SELINUX
+	if [[ $SELINUX_STATE = "true" ]]; then
+		export REAL_STATE="Permissive"
+		export PERM_FLAGS="y"
+		export ENF_FLAGS="n"
+	else
+		export REAL_STATE="Enforcing"
+		export PERM_FLAGS="n"
+		export ENF_FLAGS="y"
 	fi
 	
 	## KSU
@@ -147,11 +160,10 @@ pre_build_stage() {
 		export KSU_COMMIT_COUNT=$(cd KernelSU && git rev-list --count HEAD)
 		export KSU_VERSION_NUMBER=$(expr 10000 + $KSU_COMMIT_COUNT + 200)
 		
-		FMT="`echo $KERNEL_STRINGS`-`echo $REV`-ksu-`echo $KSU_VERSION_NUMBER`_`echo $KSU_VERSION_TAGS`"
-		
+		FMT="`echo $KERNEL_STRINGS`-`echo $REV`-ksu-`echo $KSU_VERSION_NUMBER`_`echo $KSU_VERSION_TAGS`-`echo $REAL_STATE`"
 		BUILD_FLAGS="CONFIG_KSU=y"
 	else
-		FMT="`echo $KERNEL_STRINGS`-`echo $REV`_`echo $DATE`"
+		FMT="`echo $KERNEL_STRINGS`-`echo $REV`_`echo $REAL_STATE`-`echo $DATE`"
 	fi
 	
 	# fixup! Fix ci upload filename
@@ -159,24 +171,19 @@ pre_build_stage() {
 	BOOT_FMT="$FMT.img"
 	ANYKERNEL3_FMT="`echo $FMT`_AnyKernel3.zip"
 
-	## SELINUX
-	if [[ $SELINUX_STATE = "true" ]]; then
-		export REAL_STATE="Permissive"
-		export PERM_FLAGS="y"
-		export ENF_FLAGS="n"
-	else
-		export REAL_STATE="Enforcing"
-		export PERM_FLAGS="n"
-		export ENF_FLAGS="y"
+	if [[ $ENV_IS_CI = 'true' ]]; then
+		CI_ANYKERNEL3_FMT="`echo $FMT`_AnyKernel3"
+		echo $CI_ANYKERNEL3_FMT > zipfile_format.txt
+		echo $FMT > file_format.txt
 	fi
-		
+	
 	if [[ $KSU_STATE = 'false' ]]; then
 		if [ -d $(pwd)/KernelSU ]; then
 			rm -rR $(pwd)/KernelSU -f
 		fi
-		export KSU_VER_STRINGS_STATE="unsupported"
+		export KSU_HARDCODE_STRINGS="unsupported"
 	else
-		export KSU_VER_STRINGS_STATE="`echo $KSU_VERSION_TAGS`/`echo $KSU_VERSION_NUMBER`"
+		export KSU_HARDCODE_STRINGS="`echo $KSU_VERSION_TAGS`/`echo $KSU_VERSION_NUMBER`"
 	fi
 }
 
@@ -187,6 +194,7 @@ export ANDROID_MAJOR_VERSION=t
 export PLATFORM_VERSION=13
 
 # TOOLCHAINS
+# Rissu use a custom mount point.
 if [ ! -d /rsuntk ]; then
 	export ANDROID_CC_PATH="$(pwd)/toolchains/google/bin"
 	export LLVM_PATH="$(pwd)/toolchains/clang/bin"
@@ -287,21 +295,27 @@ make_boot() {
 	cd ..
 }
 
+cleanups() {
+	rm $OUTDIR/vmlinux
+	rm $OUTDIR/vmlinux.o
+	rm $OUTDIR/System.map
+	rm $OUTDIR/.tmp_kallsyms1.o
+	rm $OUTDIR/.tmp_kallsyms1.S
+	rm $OUTDIR/.tmp_kallsyms2.o
+	rm $OUTDIR/.tmp_kallsyms2.S
+	rm $OUTDIR/.tmp_System.map
+	rm $OUTDIR/.tmp_vmlinux1
+	rm $OUTDIR/.tmp_vmlinux2
+}
+
 if [ -f $MAKE_SH ]; then
-	bash $MAKE_SH
-	rm $MAKE_SH
-	if [ -f $OUTDIR/arch/$ARCH/boot/Image ] && [ -f $OUTDIR/arch/$ARCH/boot/Image.gz ] && [ -f $OUTDIR/vmlinux ]; then
-		rm $OUTDIR/vmlinux
-		rm $OUTDIR/vmlinux.o
-		rm $OUTDIR/System.map
-		rm $OUTDIR/.tmp_kallsyms1.o
-		rm $OUTDIR/.tmp_kallsyms1.S
-		rm $OUTDIR/.tmp_kallsyms2.o
-		rm $OUTDIR/.tmp_kallsyms2.S
-		rm $OUTDIR/.tmp_System.map
-		rm $OUTDIR/.tmp_vmlinux1
-		rm $OUTDIR/.tmp_vmlinux2
-		
+	bash $MAKE_SH ## Execute make commands
+	rm $MAKE_SH ## Remove it after it done.
+	
+	# We use vmlinux, Image, and Image.gz file as an build status indicator.
+	# Because when build is completed, Image and vmlinux file will exist.
+	if [ -f $OUTDIR/arch/$ARCH/boot/Image ] && [ -f $OUTDIR/vmlinux ]; then
+		cleanups;
 		BUILD_STATE=0
 	else
 		BUILD_STATE=1

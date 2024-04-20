@@ -18,28 +18,7 @@ There's 2 method available here: CI (Github Action) and Manual build
 git clone https://github.com/rsuntk/android_kernel_samsung_a12s.git a12s_kernel && cd a12s_kernel
 ```
 
-2. Edit ```local_config.cfg```
-The local_config.cfg file looks like this:
-```
-# Local Configuration
-# only use lowercase!
-
-# Booleans
-PERMISSIVE: true
-KSU_STATE: false
-
-# Strings
-#
-# Available ksu_branch: stable and dev
-# Available boot_img_region: global and latam
-#
-REVISION: 3
-KSU_BRANCH: stable
-KERNEL_NAME: TragicHorizon
-BOOT_REGION: global
-```
-
-3. Open the terminal and type:
+2. Open the terminal and type:
 ```sh
 bash build.sh
 ```
