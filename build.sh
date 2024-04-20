@@ -160,7 +160,7 @@ pre_build_stage() {
 		export KSU_COMMIT_COUNT=$(cd KernelSU && git rev-list --count HEAD)
 		export KSU_VERSION_NUMBER=$(expr 10000 + $KSU_COMMIT_COUNT + 200)
 		
-		FMT="`echo $KERNEL_STRINGS`-`echo $REV`-ksu-`echo $KSU_VERSION_NUMBER`_`echo $KSU_VERSION_TAGS`-`echo $REAL_STATE`"
+		FMT="`echo $KERNEL_STRINGS`-`echo $REV`-`echo $REAL_STATE`-ksu-`echo $KSU_VERSION_NUMBER`_`echo $KSU_VERSION_TAGS`"
 		BUILD_FLAGS="CONFIG_KSU=y"
 	else
 		FMT="`echo $KERNEL_STRINGS`-`echo $REV`_`echo $REAL_STATE`-`echo $DATE`"
