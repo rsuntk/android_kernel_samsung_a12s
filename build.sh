@@ -194,12 +194,20 @@ export ANDROID_MAJOR_VERSION=t
 export PLATFORM_VERSION=13
 
 # TOOLCHAINS
-# Rissu use a custom mount point.
 if [ ! -d /rsuntk ]; then
-	export ANDROID_CC_PATH="$(pwd)/toolchains/google/bin"
-	export LLVM_PATH="$(pwd)/toolchains/clang/bin"
-	export GCC_PATH="$(pwd)/toolchains/gnu/bin"
+	if [[ $ENV_IS_CI = 'true' ]]; then
+		# CI default toolchain path
+		export ANDROID_CC_PATH="$(pwd)/toolchains/google/bin"
+		export LLVM_PATH="$(pwd)/toolchains/clang/bin"
+		export GCC_PATH="$(pwd)/toolchains/gnu/bin"
+	else
+		# Your own path.
+		export ANDROID_CC_PATH=
+		export LLVM_PATH=
+		export GCC_PATH=
+	fi
 else
+	# Rissu use a custom mount point.
 	export ANDROID_CC_PATH="/rsuntk/env/google/bin"
 	export LLVM_PATH="/rsuntk/env/clang-11/bin"
 	export GCC_PATH="/rsuntk/env/gnu/bin"
@@ -265,10 +273,17 @@ make_boot() {
 	$MGSKBOOT unpack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/kernel
 	cp $OUTDIR/arch/$ARCH/boot/Image $RSUPATH/kernel
-	echo "- Creating AnyKernel3"
-	bash $RSUPATH/mk_version
-	cp $OUTDIR/arch/$ARCH/boot/Image $ANYKERNEL3
-	zip -r $RSUPATH/$ANYKERNEL3_FMT $ANYKERNEL3
+	# Guard this functions, In CI, this thing is already handled by GitHub Artifacts
+	if [[ $ENV_IS_CI != 'true' ]]; then 
+		echo "- Creating AnyKernel3"
+		bash $RSUPATH/mk_version
+		cp $OUTDIR/arch/$ARCH/boot/Image $ANYKERNEL3
+		cd $ANYKERNEL3
+		zip -0 -r $RSUPATH/$ANYKERNEL3_FMT *
+		cd $RSUPATH
+	else
+		bash $RSUPATH/mk_version
+	fi
 	echo "- Repacking boot"
 	$MGSKBOOT repack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/boot.img
@@ -295,6 +310,11 @@ make_boot() {
 	cd ..
 }
 
+purify_anykernel3_folder() {
+	rm $ANYKERNEL3/Image
+	rm $ANYKERNEL3/version
+}
+
 cleanups() {
 	rm $OUTDIR/vmlinux
 	rm $OUTDIR/vmlinux.o
@@ -307,7 +327,17 @@ cleanups() {
 	rm $OUTDIR/.tmp_vmlinux1
 	rm $OUTDIR/.tmp_vmlinux2
 }
-
+upload_to_tg() {
+	cd $RSUPATH
+	TG_CHAT_ID="-1002026583953"
+	FILE_NAME="$BOOT_FMT.tar.xz"
+	if [[ $ENV_IS_CI != 'true' ]]; then
+		TG_BOT_TOKEN=$(cat rsubot.token)
+	fi
+	LINUX_VERSION=$(make kernelversion)
+	file_description="`printf Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\n\nNOTE: Untested, make sure you have a backup kernel before flashing`"
+	curl -s -F "chat_id=$TG_CHAT_ID" -F "document=@$FILE_NAME" -F "caption=$file_description" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument"
+}
 if [ -f $MAKE_SH ]; then
 	bash $MAKE_SH ## Execute make commands
 	rm $MAKE_SH ## Remove it after it done.
@@ -327,6 +357,12 @@ if [ -f $MAKE_SH ]; then
 		fi
 		echo "- Build ended at `date`. Creating boot.img"
 		make_boot;
+		if [[ $CI_UPLOAD_TG = 'true' ]]; then
+			upload_to_tg;
+		fi
+		if [[ $ENV_IS_CI != 'true' ]]; then
+			purify_anykernel3_folder;
+		fi
 	else
 		echo "- Build ended at `date`. with status: $BUILD_STATE."
 	fi
