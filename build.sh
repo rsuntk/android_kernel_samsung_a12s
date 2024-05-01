@@ -334,8 +334,8 @@ upload_to_tg() {
 	if [[ $ENV_IS_CI != 'true' ]]; then
 		TG_BOT_TOKEN=$(cat rsubot.token)
 	fi
-	LINUX_VERSION=$(make kernelversion)
-	file_description="`printf Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\n\nNOTE: Untested, make sure you have a backup kernel before flashing`"
+	LINUX_VERSION=$(cd .. && make kernelversion)
+	file_description="`printf "Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\n\nNOTE: Untested, make sure you have a backup kernel before flashing"`"
 	curl -s -F "chat_id=$TG_CHAT_ID" -F "document=@$FILE_NAME" -F "caption=$file_description" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument"
 }
 if [ -f $MAKE_SH ]; then
