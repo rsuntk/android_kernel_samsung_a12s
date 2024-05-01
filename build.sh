@@ -273,17 +273,12 @@ make_boot() {
 	$MGSKBOOT unpack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/kernel
 	cp $OUTDIR/arch/$ARCH/boot/Image $RSUPATH/kernel
-	# Guard this functions, In CI, this thing is already handled by GitHub Artifacts
-	if [[ $ENV_IS_CI != 'true' ]]; then 
-		echo "- Creating AnyKernel3"
-		bash $RSUPATH/mk_version
-		cp $OUTDIR/arch/$ARCH/boot/Image $ANYKERNEL3
-		cd $ANYKERNEL3
-		zip -0 -r $RSUPATH/$ANYKERNEL3_FMT *
-		cd $RSUPATH
-	else
-		bash $RSUPATH/mk_version
-	fi
+	echo "- Creating AnyKernel3"
+	bash $RSUPATH/mk_version
+	cp $OUTDIR/arch/$ARCH/boot/Image $ANYKERNEL3
+	cd $ANYKERNEL3
+	zip -0 -r $RSUPATH/$ANYKERNEL3_FMT *
+	cd $RSUPATH
 	echo "- Repacking boot"
 	$MGSKBOOT repack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/boot.img
@@ -328,16 +323,23 @@ cleanups() {
 	rm $OUTDIR/.tmp_vmlinux2
 }
 upload_to_tg() {
+	# Thanks to ItzKaguya, for references.
 	cd $RSUPATH
 	TG_CHAT_ID="-1002026583953"
-	FILE_NAME="$BOOT_FMT.tar.xz"
+	FILE_NAME1="$BOOT_FMT.tar.xz"
+	FILE_NAME2="$ANYKERNEL3_FMT"
 	if [[ $ENV_IS_CI != 'true' ]]; then
-		TG_BOT_TOKEN=$(cat rsubot.token)
+		TG_BOT_TOKEN=$(cat bot.token)
 	fi
-	LINUX_VERSION=$(cd .. && make kernelversion)
-	file_description="`printf "Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\n\nNOTE: Untested, make sure you have a backup kernel before flashing"`"
-	curl -s -F "chat_id=$TG_CHAT_ID" -F "document=@$FILE_NAME" -F "caption=$file_description" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument"
+	if [ ! -z $TG_BOT_TOKEN ]; then
+		LINUX_VERSION=$(cd .. && make kernelversion)
+		file_description="`printf "Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\n\n**NOTE: Untested, make sure you have a backup kernel before flashing**"`"
+		curl -F "chat_id=$TG_CHAT_ID" -F 'media=[{"type": "document", "media": "attach://file1"}, {"type": "document", "media": "attach://file2" }]' -F "file1=@$FILE_NAME1" -F "file2=@$FILE_NAME2" -F "caption=$file_description" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendMediaGroup"
+	else
+		exit 1;
+	fi
 }
+
 if [ -f $MAKE_SH ]; then
 	bash $MAKE_SH ## Execute make commands
 	rm $MAKE_SH ## Remove it after it done.
