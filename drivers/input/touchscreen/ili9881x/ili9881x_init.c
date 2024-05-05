@@ -48,6 +48,41 @@ static void touch_set_input_prop_proximity(struct input_dev *dev)
 	input_set_drvdata(dev, ilits);
 }
 
+#ifdef CONFIG_RISSU_ENABLE_DEXTOUCH
+// REQUEST by @fdur24: Add support for Samsung Dex Touchpad
+// https://github.com/Roynas-Android-Playground/kernel_samsung_universal9611/commit/236f272f50e70d8092645b1208e011390fbafa91
+// TODO: Adapt for Ilitek based touch driver
+static void touch_set_input_prop_pad(struct ilitek_ts_data *info, struct input_dev *dev)
+{
+        static char ist_phys[64] = { 0 };
+
+	snprintf(ist_phys, sizeof(ist_phys), "%s/input1", dev->name);
+	dev->phys = ist_phys;
+	dev->id.bustype = BUS_I2C;
+	dev->dev.parent = &info->client->dev;
+
+	set_bit(EV_SYN, dev->evbit);
+	set_bit(EV_KEY, dev->evbit);
+	set_bit(EV_ABS, dev->evbit);
+	set_bit(EV_SW, dev->evbit);
+	set_bit(BTN_TOUCH, dev->keybit);
+	set_bit(BTN_TOOL_FINGER, dev->keybit);
+	set_bit(KEY_BLACK_UI_GESTURE, dev->keybit);
+	set_bit(KEY_INT_CANCEL, dev->keybit);
+
+	set_bit(INPUT_PROP_POINTER, dev->propbit);
+	set_bit(KEY_HOMEPAGE, dev->keybit);
+
+	input_set_abs_params(dev, ABS_MT_POSITION_X, 0, info->max_x, 0, 0);
+	input_set_abs_params(dev, ABS_MT_POSITION_Y, 0, info->max_y, 0, 0);
+	input_set_abs_params(dev, ABS_MT_TOUCH_MAJOR, 0, INPUT_TOUCH_MAJOR_MAX, 0, 0);
+	input_set_abs_params(dev, ABS_MT_TOUCH_MINOR, 0, INPUT_TOUCH_MINOR_MAX, 0, 0);
+	input_set_abs_params(dev, ABS_MT_CUSTOM, 0, 0xFFFFFFFF, 0, 0);
+
+	input_mt_init_slots(dev, 10, INPUT_MT_POINTER);
+}
+#endif
+
 void ili_input_register(void)
 {
 	int ret = 0;
@@ -138,6 +173,14 @@ void ili_input_register(void)
 			ilits->input = NULL;
 		}
 	}
+	
+	// TODO: Search for this symbol first.
+	// FIXME: Still uncompile-able.
+#ifdef CONFIG_RISSU_ENABLE_DEXTOUCH
+	ilits->input_dev_pad = input_allocate_device();
+	ilits->input_dev_pad->name = "sec_touchpad";
+	ret = input_register_device(ilits->input_dev_pad);
+#endif
 }
 
 #if REGULATOR_POWER
