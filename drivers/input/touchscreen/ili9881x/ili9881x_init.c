@@ -58,7 +58,7 @@ static void touch_set_input_prop_pad(struct input_dev *dev)
 	snprintf(ist_phys, sizeof(ist_phys), "%s/input1", dev->name);
 	dev->phys = ist_phys;
 	dev->id.bustype = BUS_I2C;
-	dev->dev.parent = &info->client->dev;
+	dev->dev.parent = ilits->dev;
 
 	set_bit(EV_SYN, dev->evbit);
 	set_bit(EV_KEY, dev->evbit);
@@ -72,10 +72,10 @@ static void touch_set_input_prop_pad(struct input_dev *dev)
 	set_bit(INPUT_PROP_POINTER, dev->propbit);
 	set_bit(KEY_HOMEPAGE, dev->keybit);
 
-	input_set_abs_params(dev, ABS_MT_POSITION_X, 0, info->max_x, 0, 0);
-	input_set_abs_params(dev, ABS_MT_POSITION_Y, 0, info->max_y, 0, 0);
-	input_set_abs_params(dev, ABS_MT_TOUCH_MAJOR, 0, INPUT_TOUCH_MAJOR_MAX, 0, 0);
-	input_set_abs_params(dev, ABS_MT_TOUCH_MINOR, 0, INPUT_TOUCH_MINOR_MAX, 0, 0);
+	input_set_abs_params(dev, ABS_MT_POSITION_X, 0, ilits->max_x, 0, 0);
+	input_set_abs_params(dev, ABS_MT_POSITION_Y, 0, ilits->max_y, 0, 0);
+	input_set_abs_params(dev, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);
+	input_set_abs_params(dev, ABS_MT_TOUCH_MINOR, 0, 255, 0, 0);
 	input_set_abs_params(dev, ABS_MT_CUSTOM, 0, 0xFFFFFFFF, 0, 0);
 
 	input_mt_init_slots(dev, 10, INPUT_MT_POINTER);
@@ -172,19 +172,20 @@ void ili_input_register(void)
 		}
 	}
 	
-	// TODO: Search for this symbol first.
-	// FIXME: Still uncompile-able.
+	// STILL NOT GOOD ENOUGH.
 	ilits->input_dev_pad = input_allocate_device();
 	ilits->input_dev_pad->name = "sec_touchpad";
+	touch_set_input_prop_pad(ilits->input_dev_pad);
 	ret = input_register_device(ilits->input_dev_pad);
 	if (ret < 0) {
-	    input_err(true, &client->dev, "%s: Unable to register %s input device\n", __func__, ilits->input_dev_pad->name);
+	    input_err(true, ilits->dev, "%s: Unable to register %s input device\n", __func__, ilits->input_dev_pad->name);
 	    
 	    input_free_device(ilits->input);
 	    if (ilits->input_dev_pad)
-	            input_free_device(ilits->input_dev_pad)
+	            input_free_device(ilits->input_dev_pad);
 	            
 	    input_unregister_device(ilits->input_dev_pad);
+	    ilits->input = NULL;
 	}
 }
 
