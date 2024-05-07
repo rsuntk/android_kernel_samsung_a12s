@@ -48,11 +48,10 @@ static void touch_set_input_prop_proximity(struct input_dev *dev)
 	input_set_drvdata(dev, ilits);
 }
 
-#ifdef CONFIG_RISSU_ENABLE_DEXTOUCH
 // REQUEST by @fdur24: Add support for Samsung Dex Touchpad
 // https://github.com/Roynas-Android-Playground/kernel_samsung_universal9611/commit/236f272f50e70d8092645b1208e011390fbafa91
 // TODO: Adapt for Ilitek based touch driver
-static void touch_set_input_prop_pad(struct ilitek_ts_data *info, struct input_dev *dev)
+static void touch_set_input_prop_pad(struct input_dev *dev)
 {
         static char ist_phys[64] = { 0 };
 
@@ -81,7 +80,6 @@ static void touch_set_input_prop_pad(struct ilitek_ts_data *info, struct input_d
 
 	input_mt_init_slots(dev, 10, INPUT_MT_POINTER);
 }
-#endif
 
 void ili_input_register(void)
 {
@@ -176,11 +174,18 @@ void ili_input_register(void)
 	
 	// TODO: Search for this symbol first.
 	// FIXME: Still uncompile-able.
-#ifdef CONFIG_RISSU_ENABLE_DEXTOUCH
 	ilits->input_dev_pad = input_allocate_device();
 	ilits->input_dev_pad->name = "sec_touchpad";
 	ret = input_register_device(ilits->input_dev_pad);
-#endif
+	if (ret < 0) {
+	    input_err(true, &client->dev, "%s: Unable to register %s input device\n", __func__, ilits->input_dev_pad->name);
+	    
+	    input_free_device(ilits->input);
+	    if (ilits->input_dev_pad)
+	            input_free_device(ilits->input_dev_pad)
+	            
+	    input_unregister_device(ilits->input_dev_pad);
+	}
 }
 
 #if REGULATOR_POWER
