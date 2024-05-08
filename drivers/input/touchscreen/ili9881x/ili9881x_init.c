@@ -48,13 +48,14 @@ static void touch_set_input_prop_proximity(struct input_dev *dev)
 	input_set_drvdata(dev, ilits);
 }
 
+#ifdef CONFIG_RISSU_DEXTP_ILITEK_SUPPORT
 /* REQUEST by @fdur24: Add support for Samsung Dex Touchpad on ilitek touchscreen.
- * Adapted patch from melfas_mss100:
+ * Adapted patch from melfas ts driver:
  * https://github.com/Roynas-Android-Playground/kernel_samsung_universal9611/commit/236f272f50e70d8092645b1208e011390fbafa91
  * Rissu Projects (C) 2024
  * add support for dex touchpad is completed.
  */
-static void touch_set_input_prop_pad(struct input_dev *dev)
+static void touch_set_input_prop_dexpad(struct input_dev *dev)
 {
         static char ist_phys[64] = { 0 };
 
@@ -83,6 +84,7 @@ static void touch_set_input_prop_pad(struct input_dev *dev)
 
 	input_mt_init_slots(dev, 10, INPUT_MT_POINTER);
 }
+#endif
 
 void ili_input_register(void)
 {
@@ -174,22 +176,24 @@ void ili_input_register(void)
 			ilits->input = NULL;
 		}
 	}
-	
-	// STILL NOT GOOD ENOUGH.
-	ilits->input_dev_pad = input_allocate_device();
-	ilits->input_dev_pad->name = "sec_touchpad";
-	touch_set_input_prop_pad(ilits->input_dev_pad);
-	ret = input_register_device(ilits->input_dev_pad);
+
+#ifdef CONFIG_RISSU_DEXTP_ILITEK_SUPPORT
+	// tempfix: add #ifdef guard
+	ilits->input_dev_dexpad = input_allocate_device();
+	ilits->input_dev_dexpad->name = "sec_touchpad";
+	touch_set_input_prop_dexpad(ilits->input_dev_dexpad);
+	ret = input_register_device(ilits->input_dev_dexpad);
 	if (ret < 0) {
-	    input_err(true, ilits->dev, "%s: Unable to register %s input device\n", __func__, ilits->input_dev_pad->name);
+	    input_err(true, ilits->dev, "%s: Unable to register %s input device\n", __func__, ilits->input_dev_dexpad->name);
 	    
 	    input_free_device(ilits->input);
-	    if (ilits->input_dev_pad)
-	            input_free_device(ilits->input_dev_pad);
+	    if (ilits->input_dev_dexpad)
+	            input_free_device(ilits->input_dev_dexpad);
 	            
-	    input_unregister_device(ilits->input_dev_pad);
+	    input_unregister_device(ilits->input_dev_dexpad);
 	    ilits->input = NULL;
 	}
+#endif
 }
 
 #if REGULATOR_POWER
