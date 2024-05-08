@@ -24,7 +24,7 @@ I. How to install the kernel:
 - For tar file:
 	1. Boot to download mode.
 	2. Open odin (for windows) or odin4 (for linux)
-	3.1 For odin: put it at AP slot, and then proceed to flash it
+	3.1 For odin: put it at AP slot, and then preceed to flash it
 	3.2 For odin4: Open terminal, and type:
 		
 		## Get device path

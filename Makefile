@@ -2,7 +2,13 @@
 VERSION = 4
 PATCHLEVEL = 19
 SUBLEVEL = 150
+
+ifeq ($(ENV_IS_CI),true)
+EXTRAVERSION = -ci
+else
 EXTRAVERSION =
+endif
+
 NAME = "People's Front"
 
 # *DOCUMENTATION*
