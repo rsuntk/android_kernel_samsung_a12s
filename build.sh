@@ -264,30 +264,39 @@ printf "#! /usr/bin/env bash
 make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $DEFCONFIG`
 make -C $(pwd) O=$(pwd)/out CONFIG_LOCALVERSION=\"-`echo $KERNEL_STRINGS`\" `echo $BUILD_FLAGS` `echo $THREADCOUNT`" > make_cmd.sh
 
+## Rissu Kernel Project things.
 make_boot() {
 	cd $RSUPATH
 	cat $RSUPATH/art.txt
 	tar -xf $OEMBOOT -C $RSUPATH
 	echo "";
+	## << Unpack boot with magiskboot
 	echo "- Unpacking boot"
 	$MGSKBOOT unpack $RSUPATH/boot.img 2>/dev/null
+	## << Remove stock samsung kernel
 	rm $RSUPATH/kernel
+	## << Copy new kernel to current path
 	cp $OUTDIR/arch/$ARCH/boot/Image $RSUPATH/kernel
+	## << Create flashable AnyKernel3
 	echo "- Creating AnyKernel3"
 	bash $RSUPATH/mk_version
 	cp $OUTDIR/arch/$ARCH/boot/Image $ANYKERNEL3
 	cd $ANYKERNEL3
 	zip -0 -r $RSUPATH/$ANYKERNEL3_FMT *
 	cd $RSUPATH
+	## << Repacking boot
 	echo "- Repacking boot"
 	$MGSKBOOT repack $RSUPATH/boot.img 2>/dev/null
 	rm $RSUPATH/boot.img
 	mv $RSUPATH/new-boot.img $RSUPATH/boot.img
+	## << Compress it, to avoid long download time
 	echo "- Compressing with lz4"
 	lz4 -B6 --content-size boot.img boot.img.lz4 2>/dev/null
+	## << Make it ODIN flashable
 	echo "- Creating tarball file"
 	tar -cf $TAR_FMT boot.img.lz4
 	rm $RSUPATH/boot.img.lz4
+	## << Pack boot.img to tar.xz with Level 9 Extreme flags
 	echo "- Creating boot file"
 	echo "- Compressing boot file"
 	tar -cJf - boot.img | xz -9e -c - > $BOOT_FMT.tar.xz
