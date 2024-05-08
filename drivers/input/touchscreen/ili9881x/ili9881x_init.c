@@ -48,9 +48,12 @@ static void touch_set_input_prop_proximity(struct input_dev *dev)
 	input_set_drvdata(dev, ilits);
 }
 
-// REQUEST by @fdur24: Add support for Samsung Dex Touchpad
-// https://github.com/Roynas-Android-Playground/kernel_samsung_universal9611/commit/236f272f50e70d8092645b1208e011390fbafa91
-// TODO: Adapt for Ilitek based touch driver
+/* REQUEST by @fdur24: Add support for Samsung Dex Touchpad on ilitek touchscreen.
+ * Adapted patch from melfas_mss100:
+ * https://github.com/Roynas-Android-Playground/kernel_samsung_universal9611/commit/236f272f50e70d8092645b1208e011390fbafa91
+ * Rissu Projects (C) 2024
+ * add support for dex touchpad is completed.
+ */
 static void touch_set_input_prop_pad(struct input_dev *dev)
 {
         static char ist_phys[64] = { 0 };
