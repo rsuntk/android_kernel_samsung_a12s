@@ -48,7 +48,6 @@ static void touch_set_input_prop_proximity(struct input_dev *dev)
 	input_set_drvdata(dev, ilits);
 }
 
-#ifdef CONFIG_RISSU_DEXTP_ILITEK_SUPPORT
 /* REQUEST by @fdur24: Add support for Samsung Dex Touchpad on ilitek touchscreen.
  * Adapted patch from melfas ts driver:
  * https://github.com/Roynas-Android-Playground/kernel_samsung_universal9611/commit/236f272f50e70d8092645b1208e011390fbafa91
@@ -84,7 +83,6 @@ static void touch_set_input_prop_dexpad(struct input_dev *dev)
 
 	input_mt_init_slots(dev, 10, INPUT_MT_POINTER);
 }
-#endif
 
 void ili_input_register(void)
 {
@@ -177,8 +175,7 @@ void ili_input_register(void)
 		}
 	}
 
-#ifdef CONFIG_RISSU_DEXTP_ILITEK_SUPPORT
-	// tempfix: add #ifdef guard
+        /* Register sec_touchpad */
 	ilits->input_dev_dexpad = input_allocate_device();
 	ilits->input_dev_dexpad->name = "sec_touchpad";
 	touch_set_input_prop_dexpad(ilits->input_dev_dexpad);
@@ -193,7 +190,6 @@ void ili_input_register(void)
 	    input_unregister_device(ilits->input_dev_dexpad);
 	    ilits->input = NULL;
 	}
-#endif
 }
 
 #if REGULATOR_POWER
