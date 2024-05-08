@@ -336,13 +336,15 @@ upload_to_tg() {
 	cd $RSUPATH
 	TG_CHAT_ID="-1002026583953" # Rissu Projects group
 	FILE_NAME="$ANYKERNEL3_FMT"
+	GIT_REPO_HASH=$(cd .. && git rev-parse --short HEAD)
+	GIT_REPO_COMMIT_COUNT=$(cd .. && git rev-list --count HEAD)
 	if [[ $ENV_IS_CI != 'true' ]]; then
 		TG_BOT_TOKEN=$(cat bot.token)
 	fi
 	if [ ! -z $TG_BOT_TOKEN ]; then	
 		LINUX_VERSION=$(cd .. && make kernelversion)
-		file_description="`printf "Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\nDevice: a12s\n\nNOTE: Untested, make sure you have a backup kernel before flashing"`"
-		curl -s -F "chat_id=$TG_CHAT_ID" -F "document=@$FILE_NAME" -F "caption=$file_description" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument"
+		file_description="`printf "Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\nDevice: a12s\n\nci_$GIT_REPO_COMMIT_COUNT\n$GIT_REPO_HASH\n\n*NOTE: Untested, make sure you have a backup kernel before flashing*"`"
+		curl -s -F "chat_id=$TG_CHAT_ID" -F "document=@$FILE_NAME" -F parse_mode='Markdown' -F "caption=$file_description" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument"
 	else
 		echo "! Telegram token empty. Abort kernel uploading";
 		exit 1;
