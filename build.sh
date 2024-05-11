@@ -298,15 +298,9 @@ make_boot() {
 	rm $RSUPATH/boot.img.lz4
 	## << Pack boot.img to tar.xz with Level 9 Extreme flags
 	echo "- Creating boot file"
-	echo "- Compressing boot file"
-	tar -cJf - boot.img | xz -9e -c - > $BOOT_FMT.tar.xz
 	echo "- Done!"
 	echo "- Cleaning files"
-	if [[ $GIT_UPLOAD_UNCOMPRESSED_BOOT_IMG = "true" ]]; then
-		mv $RSUPATH/boot.img $RSUPATH/$BOOT_FMT
-	else
-		rm $RSUPATH/boot.img
-	fi
+	mv $RSUPATH/boot.img $RSUPATH/$BOOT_FMT
 	rm $RSUPATH/kernel && rm $RSUPATH/dtb
 	if [ -f $RSUPATH/ramdisk.cpio ]; then
 		rm $RSUPATH/ramdisk.cpio
@@ -331,25 +325,6 @@ cleanups() {
 	rm $OUTDIR/.tmp_vmlinux1
 	rm $OUTDIR/.tmp_vmlinux2
 }
-upload_to_tg() {
-	# Thanks to ItzKaguya, for references.
-	cd $RSUPATH
-	TG_CHAT_ID="-1002026583953" # Rissu Projects group
-	FILE_NAME="$ANYKERNEL3_FMT"
-	GIT_REPO_HASH=$(cd .. && git rev-parse --short HEAD)
-	GIT_REPO_COMMIT_COUNT=$(cd .. && git rev-list --count HEAD)
-	if [[ $ENV_IS_CI != 'true' ]]; then
-		TG_BOT_TOKEN=$(cat bot.token)
-	fi
-	if [ ! -z $TG_BOT_TOKEN ]; then	
-		LINUX_VERSION=$(cd .. && make kernelversion)
-		file_description="`printf "Linux Version: $LINUX_VERSION\nAndroid: $ANDROID_MAJOR_VERSION/$PLATFORM_VERSION\nKSU: $KSU_HARDCODE_STRINGS\nDevice: a12s\n\nCI: $GIT_REPO_COMMIT_COUNT\nID: $GIT_REPO_HASH\n\n*NOTE: Untested, make sure you have a backup kernel before flashing*"`"
-		curl -s -F "chat_id=$TG_CHAT_ID" -F "document=@$FILE_NAME" -F parse_mode='Markdown' -F "caption=$file_description" "https://api.telegram.org/bot$TG_BOT_TOKEN/sendDocument"
-	else
-		echo "! Telegram token empty. Abort kernel uploading";
-		exit 1;
-	fi
-}
 
 if [ -f $MAKE_SH ]; then
 	bash $MAKE_SH ## Execute make commands
@@ -363,6 +338,10 @@ if [ -f $MAKE_SH ]; then
 	else
 		BUILD_STATE=1
 	fi
+	# Have some known issue in here. This indicator cannot detect
+	# kernel module building. If something failed, well, it keep
+	# detecting as successful.
+	
 	echo "- Build state: $BUILD_STATE"
 	if [[ $BUILD_STATE = '0' ]]; then
 		if [[ $GIT_UPLOAD_GZ = "true" ]]; then
@@ -370,9 +349,6 @@ if [ -f $MAKE_SH ]; then
 		fi
 		echo "- Build ended at `date`. Creating boot.img"
 		make_boot;
-		if [[ $CI_UPLOAD_TG = 'true' ]]; then
-			upload_to_tg;
-		fi
 		if [[ $ENV_IS_CI != 'true' ]]; then
 			purify_anykernel3_folder;
 		fi

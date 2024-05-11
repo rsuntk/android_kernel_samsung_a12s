@@ -33,10 +33,6 @@ on:
         description: 'Upload uncompressed boot.img (increase size!)'
         required: true
         type: boolean
-      UPLOAD_TO_TG:
-        description: 'Upload to Telegram (a few adjustments needed)'
-        required: true
-        type: boolean
         
 jobs:
   build:
@@ -66,13 +62,10 @@ jobs:
         export ENV_IS_CI="true"
         export CI_ENV_REVISION=$REV_INPUT
         export CI_ENV_LOCALVERSION=$LOCALVERSION_INPUT
-        export CI_UPLOAD_TG=$TG_UPLOAD
         export KSU_BRANCH=$KERNELSU_BRANCH_INPUT
         export KSU_STATE=$KERNELSU_STATE_INPUT
         export GIT_UPLOAD_GZ=$UPLOAD_IMAGE_GZ
-        export GIT_UPLOAD_UNCOMPRESSED_BOOT_IMG=$UPLOAD_UNCOMPRESSED_BOOT_IMG
         export SELINUX_STATE=$SELINUX_STATE_INPUT
-        export TG_BOT_TOKEN=$TG_TOKEN
         bash $(pwd)/build.sh
         zipName=`cat $(pwd)/zipfile_format.txt` && echo "zipName=$zipName" >> $GITHUB_OUTPUT
         imgName=`cat $(pwd)/file_format.txt` && echo "imgName=$imgName" >> $GITHUB_OUTPUT
@@ -83,17 +76,8 @@ jobs:
         KERNELSU_STATE_INPUT: ${{ github.event.inputs.KERNELSU_SUPPORT }}
         SELINUX_STATE_INPUT: ${{ github.event.inputs.USE_PERMISSIVE }}
         UPLOAD_IMAGE_GZ: ${{ github.event.inputs.UPLOAD_IMAGE_GZ }}
-        UPLOAD_UNCOMPRESSED_BOOT_IMG: ${{ github.event.inputs.UPLOAD_UNCOMPRESSED_BOOT_IMG }}
-        TG_TOKEN: ${{ secrets.BOT_TOKEN }}
-        TG_UPLOAD: ${{ github.event.inputs.UPLOAD_TO_TG }}
       working-directory: android_kernel_samsung_a12s
-    - name: Upload .tar.xz
-      uses: actions/upload-artifact@v4.3.1
-      with:
-        name: ${{ steps.buildKernel.outputs.imgName }}
-        path: android_kernel_samsung_a12s/Rissu/*.tar.xz
     - name: Upload .img
-      if: env.UPLOAD_UNCOMPRESSED_BOOT_IMG == true
       uses: actions/upload-artifact@v4.3.1
       with:
         name: ${{ steps.buildKernel.outputs.imgName }}

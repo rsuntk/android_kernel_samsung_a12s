@@ -1771,7 +1771,6 @@ void nvt_ts_proximity_report(uint8_t *data)
 
 }
 #endif
-
 /*******************************************************
 Description:
 	Novatek touchscreen work function.
@@ -2255,7 +2254,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 		goto err_input_dev_prox_alloc_failed;
 	}
 #endif
-
+        
 	ts->platdata->max_touch_num = TOUCH_MAX_FINGER_NUM;
 
 #if TOUCH_KEY_NUM > 0
@@ -2318,7 +2317,19 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	ts->input_dev_proximity->phys = ts->phys;
 	ts->input_dev_proximity->id.bustype = BUS_SPI;
 #endif
-
+        
+        // Rissu: Add dex touchpad support for Novatek
+        ts->input_dev_touchpad->evbit[0] = BIT_MASK(EV_SYN) | BIT_MASK(EV_KEY) | BIT_MASK(EV_ABS) | BIT_MASK(EV_SW);
+        ts->input_dev_touchpad->propbit[0] = BIT(INPUT_PROP_POINTER);
+        
+        input_set_abs_params(ts->input_dev_touchpad, ABS_MT_POSITION_X, 0, ts->platdata->abs_x_max, 0, 0);
+	input_set_abs_params(ts->input_dev_touchpad, ABS_MT_POSITION_Y, 0, ts->platdata->abs_y_max, 0, 0);
+	input_set_abs_params(ts->input_dev_touchpad, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);
+	input_set_abs_params(ts->input_dev_touchpad, ABS_MT_TOUCH_MINOR, 0, 255, 0, 0);
+	input_set_abs_params(ts->input_dev_touchpad, ABS_MT_CUSTOM, 0, 0xFFFFFFFF, 0, 0);
+        
+        input_mt_init_slots(ts->input_dev_touchpad, ts->platdata->max_touch_num, INPUT_MT_POINTER);
+        
 	//---register input device---
 	ret = input_register_device(ts->input_dev);
 	if (ret) {
