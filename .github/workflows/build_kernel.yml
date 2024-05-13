@@ -9,7 +9,7 @@ on:
       STRINGS:
         description: 'Kernel Strings (example: MyKernel)'
         required: true
-        default: 'MyKernel'
+        default: '-MyKernel'
       BOOT_TARGET:
         description: 'Stock boot.img region'
         required: true
