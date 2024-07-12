@@ -14,7 +14,7 @@ on:
         description: 'KernelSU support'
         required: true
         type: boolean
-      GIT_USE_PERMISSIVE:
+      GIT_PERMISSIVE:
         description: 'SELinux Permissive'
         required: true
         type: boolean
