@@ -20,13 +20,11 @@
 #include "av_permissions.h"
 #include "security.h"
 
-// [ SEC_SELINUX_PORTING_COMMON
 #ifdef CONFIG_SECURITY_SELINUX_DEVELOP
 extern int selinux_enforcing;
 #else
 #define selinux_enforcing 1
 #endif
-// ] SEC_SELINUX_PORTING_COMMON
 
 /*
  * An entry in the AVC.
@@ -200,6 +198,11 @@ void avc_disable(void);
 
 #ifdef CONFIG_SECURITY_SELINUX_AVC_STATS
 DECLARE_PER_CPU(struct avc_cache_stats, avc_cache_stats);
+#endif
+
+#ifdef CONFIG_MTK_SELINUX_AEE_WARNING
+extern struct sk_buff *audit_get_skb(struct audit_buffer *ab);
+extern void __attribute__((weak)) mtk_audit_hook(char *data);
 #endif
 
 #endif /* _SELINUX_AVC_H_ */
