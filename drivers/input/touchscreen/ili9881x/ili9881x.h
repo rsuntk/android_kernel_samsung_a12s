@@ -900,6 +900,8 @@ struct ilitek_ts_data {
 	struct spi_device *spi;
 	struct input_dev *input;
 	struct input_dev *input_dev_proximity;
+	/* Rissu: bring sec_touchpad */
+	struct input_dev *input_dev_sec_touchpad;
 	struct device *dev;
 	struct wakeup_source *ws;
 
