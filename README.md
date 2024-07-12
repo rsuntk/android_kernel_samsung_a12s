@@ -14,6 +14,9 @@ Battery  | Li-ion 5000mAh, non-removable
 
 ## JSON Variable
 `cross_compile:` Google's toolchains path (aarch64-linux-android-)
+
 `llvm_path:` LLVM toolchains path (clang & ld.lld)
+
 `clang_triple:` GNU's toolchains path (aarch64-linux-gnu-)
+
 `defconfig:` Defconfig

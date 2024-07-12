@@ -31,10 +31,6 @@ if [ -d $RSU_ENV ]; then
 	
 	# Rissu always use his defconfig
 	__DEFCONFIG="rsuntk-a12snsxx_defconfig"
-	
-	# Rissu always use llvm-ld.lld!
-	__LD_IS_LLD=true
-	
 elif [ $ENV_IS_CI = true ]; then
 	$ENV=$(pwd)/toolchains
 	if [ ! -d $ENV ]; then
@@ -46,7 +42,6 @@ elif [ $ENV_IS_CI = true ]; then
 	__CROSS_COMPILE=$ENV/google/bin/aarch64-linux-android-
 	__CLANG_TRIPLE=aarch64-linux-gnu-
 	__DEFCONFIG=$GIT_ENV_DEFCONFIG
-	__LD_IS_LLD=true
 else
 	# Rissu: we use jq to parse json, make sure that you've installed it.
 	# or, disable it if you didn't want it.
@@ -59,12 +54,7 @@ else
 		LLVM_PATH=$(jq .llvm_path configuration.json)
 		__CC=$LLVM_PATH/clang
 		__CROSS_COMPILE=$(jq .cross_compile configuration.json)
-		__LD_IS_LLD=$(jq .ld_is_llvm_lld configuration.json)
-		if [ $__LD_IS_LLD = true ]; then
-			__LD=$LLVM_PATH/ld.lld
-		else
-			__LD=$__CROSS_COMPILE/aarch64-linux-android-ld
-		fi
+		__LD=$LLVM_PATH/ld.lld
 		__CLANG_TRIPLE=$(jq .clang_triple configuration.json)
 		__DEFCONFIG=$(jq .defconfig configuration.json)
 		if [ -z $__DEFCONFIG ]; then
@@ -76,16 +66,9 @@ else
 		__CROSS_COMPILE=
 		__CLANG_TRIPLE=
 		__DEFCONFIG=
-		__LD_IS_LLD=
 	fi
 fi
 
-if [[ $__LD_IS_LLD = true ]]; then
-	export LD_IS_LLD=true
-else
-	export LD_IS_LLD=false
-fi
-	
 make --no-silent --jobs $(nproc --all) CC=$__CC LD=$__LD CROSS_COMPILE=$__CROSS_COMPILE CLANG_TRIPLE=$__CLANG_TRIPLE -C $(pwd) O=$(pwd)/out ARCH=arm64 `echo $__DEFCONFIG`
 export SHOW_TC_PATH=n
 make --no-silent --jobs $(nproc --all) CC=$__CC LD=$__LD CROSS_COMPILE=$__CROSS_COMPILE CLANG_TRIPLE=$__CLANG_TRIPLE -C $(pwd) O=$(pwd)/out ARCH=arm64

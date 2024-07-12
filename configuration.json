@@ -2,6 +2,5 @@
 	"cross_compile": strings,
 	"llvm_path": strings,
 	"clang_triple": strings,
-	"ld_is_llvm_lld": boolean,
 	"defconfig": samsung/exynos850-a12snsxx_defconfig,
 }

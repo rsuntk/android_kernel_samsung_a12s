@@ -370,7 +370,7 @@ KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
 
 # Make variables (CC, etc...)
 AS		= $(CROSS_COMPILE)as
-LD		?= $(CROSS_COMPILE)ld
+LD		?= $(srctree)/toolchain/clang/host/linux-x86/clang-r353983c/bin/ld.lld
 CC              ?= $(srctree)/toolchain/clang/host/linux-x86/clang-r353983c/bin/clang
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
@@ -431,12 +431,6 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wno-trigraphs \
 		   -Werror \
 		   -Wstrict-prototypes
 KBUILD_CPPFLAGS := -D__KERNEL__
-
-# Rissu: add this thing
-ifeq ($(LD_IS_LLD), true)
-export CONFIG_LD_IS_LLD=y
-endif
-
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS_MODULE  := -DMODULE
