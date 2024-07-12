@@ -7,7 +7,7 @@
 export PLATFORM_VERSION=13
 export ANDROID_MAJOR_VERSION=t
 export ARCH=arm64
-export RSU_ENV=/rsuntk
+export RSU_ENV=/rsuntk0
 export CLANG_VERSION=11
 export SHOW_TC_PATH=y
 
@@ -31,7 +31,8 @@ if [ -d $RSU_ENV ]; then
 	
 	# Rissu always use his defconfig
 	__DEFCONFIG="rsuntk-a12snsxx_defconfig"
-elif [ $ENV_IS_CI = true ]; then
+	
+elif [ ! -z $ENV_IS_CI ]; then
 	$ENV=$(pwd)/toolchains
 	if [ ! -d $ENV ]; then
 		pr_err "Unspecified toolchains path."
@@ -46,7 +47,9 @@ else
 	# Rissu: we use jq to parse json, make sure that you've installed it.
 	# or, disable it if you didn't want it.
 	USE_JQ=true
-	if [ "$(which jq; echo $?)" != 0 ] && [ ! -z $USE_JQ ]; then
+	JQ="`test jq; echo $?`"
+	echo $JQ
+	if ! command -v jq && [ ! -z $USE_JQ ]; then
 		pr_err "jq not found, please install it. or, remove USE_JQ variable in this file to skip. But you still need to add your path manually!"
 	fi
 
@@ -68,7 +71,7 @@ else
 		__DEFCONFIG=
 	fi
 fi
-
+	
 make --no-silent --jobs $(nproc --all) CC=$__CC LD=$__LD CROSS_COMPILE=$__CROSS_COMPILE CLANG_TRIPLE=$__CLANG_TRIPLE -C $(pwd) O=$(pwd)/out ARCH=arm64 `echo $__DEFCONFIG`
 export SHOW_TC_PATH=n
 make --no-silent --jobs $(nproc --all) CC=$__CC LD=$__LD CROSS_COMPILE=$__CROSS_COMPILE CLANG_TRIPLE=$__CLANG_TRIPLE -C $(pwd) O=$(pwd)/out ARCH=arm64
