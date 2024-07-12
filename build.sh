@@ -30,7 +30,7 @@ if [ -d $RSU_ENV ]; then
 	__CLANG_TRIPLE=aarch64-linux-gnu-
 	
 	# Rissu always use his defconfig
-	__DEFCONFIG="rsuntk-erofs_defconfig"
+	__DEFCONFIG="rsuntk-a12snsxx_defconfig"
 	
 	# Rissu always use llvm-ld.lld!
 	__LD_IS_LLD=true
