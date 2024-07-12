@@ -11,12 +11,3 @@ Memory   | 3GB, 4GB RAM (LPDDR4X)
 Storage  | 32GB, 64GB, 128GB
 Shipped Android version | Android 11, OneUI 3.1
 Battery  | Li-ion 5000mAh, non-removable
-
-## JSON Variable
-`cross_compile:` Google's toolchains path (aarch64-linux-android-)
-
-`llvm_path:` LLVM toolchains path (clang & ld.lld)
-
-`clang_triple:` GNU's toolchains path (aarch64-linux-gnu-)
-
-`defconfig:` Defconfig
