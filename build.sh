@@ -34,7 +34,7 @@ if [ -d $RSU_ENV ]; then
 	__DEFCONFIG="rsuntk-a12snsxx_defconfig"
 	
 elif [ ! -z $ENV_IS_CI ]; then
-	$ENV=$(pwd)/toolchains
+	ENV=$(pwd)/toolchains
 	if [ ! -d $ENV ]; then
 		pr_err "Unspecified toolchains path."
 	fi
