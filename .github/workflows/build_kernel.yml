@@ -1,0 +1,86 @@
+name: Build Kernel
+on:
+  workflow_dispatch:
+    inputs:
+      GIT_DEV_VAR:
+        description: 'Device variant'
+        required: true
+        default: a12s
+        type: choice
+        options:
+        - a12s
+        - m12
+      GIT_KERNELSU_SUPPORT:
+        description: 'KernelSU support'
+        required: true
+        type: boolean
+      GIT_USE_PERMISSIVE:
+        description: 'SELinux Permissive'
+        required: true
+        type: boolean
+      GIT_UPLOAD_IMAGE_GZ:
+        description: 'Upload Image.gz file'
+        required: true
+        type: boolean
+        
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: TG
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: android_kernel_samsung_a12s
+        fetch-depth: 0
+    - name: Prepare dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl curl lz4 -y
+        sudo aptitude install libssl-dev -y
+    - name: Fetch toolchains
+      run: |
+        mkdir toolchains
+        cd toolchains
+        git clone https://gitlab.com/Rissu-Projekt/toolchains/clang-toolchains.git clang-11
+        git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-android.git google
+        #git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-gnu.git gnu
+      working-directory: android_kernel_samsung_a12s
+    - name: Build kernel
+      id: buildKernel
+      run: |
+        export ENV_IS_CI="true"
+        export KSU_STATE=$PRE_KERNELSU_STATE
+        export UPLOAD_GZ=$PRE_UPLOAD_IMAGE_GZ
+        export DEVICE_VARIANT=$PRE_DEVICE_VARIANT
+        if [[ $DEVICE_VARIANT = 'a12s' ]] && [[ $PRE_SELINUX_STATE = 'true' ]]; then
+        	export GIT_ENV_DEFCONFIG="rsuntk-perm-a12snsxx_defconfig"
+        	export SELINUX_STATE="Permissive"
+        elif [[ $DEVICE_VARIANT = 'm12' ]] && [[ $PRE_SELINUX_STATE = 'true' ]]; then
+        	export SELINUX_STATE="Permissive"
+        	export GIT_ENV_DEFCONFIG="rsuntk-perm-m12nsxx_defconfig"
+        elif [[ $DEVICE_VARIANT = 'a12s' ]] && [[ $PRE_SELINUX_STATE = 'false' ]]; then
+        	export SELINUX_STATE="Enforcing"
+        	export GIT_ENV_DEFCONFIG="rsuntk-enf-m12nsxx_defconfig"
+        elif [[ $DEVICE_VARIANT = 'm12' ]] && [[ $PRE_SELINUX_STATE = 'false' ]]; then
+        	export SELINUX_STATE="Enforcing"
+        	export GIT_ENV_DEFCONFIG="rsuntk-enf-m12nsxx_defconfig"
+        fi
+        bash $(pwd)/build.sh
+        zipName=`cat $(pwd)/zipfile_format.txt` && echo "zipName=$zipName" >> $GITHUB_OUTPUT
+      env:
+        PRE_DEVICE_VARIANT: ${{ github.event.inputs.GIT_DEV_VAR }}
+        PRE_KERNELSU_STATE: ${{ github.event.inputs.GIT_KERNELSU_SUPPORT }}
+        PRE_SELINUX_STATE: ${{ github.event.inputs.GIT_PERMISSIVE }}
+        PRE_UPLOAD_IMAGE_GZ: ${{ github.event.inputs.GIT_UPLOAD_IMAGE_GZ }}
+      working-directory: android_kernel_samsung_a12s
+    - name: Upload zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.buildKernel.outputs.zipName }}
+        path: android_kernel_samsung_a12s/Rissu/AnyKernel3/*
+    - name: Upload .gz
+      if: env.PRE_UPLOAD_IMAGE_GZ == true
+      uses: actions/upload-artifact@v4
+      with:
+        name: Image
+        path: android_kernel_samsung_a12s/Rissu/*.gz

@@ -1,0 +1,22 @@
+#! /usr/bin/env bash
+cd $RSUPATH
+if [[ $KSU_STATE = "true" ]]; then
+	KSU_ANYKERNEL3=$KSU_VERSION
+else
+	KSU_ANYKERNEL3="-"
+fi
+
+BORDER="-------------------------------------------------"
+
+printf "
+$BORDER
+Name	:	Rissu-CI
+$BORDER
+Device	:	$DEVICE_VARIANT
+$BORDER
+ID	:	$DATE
+$BORDER
+KSU	:	$KSU_ANYKERNEL3
+$BORDER
+SELinux	:	$SELINUX_STATE
+$BORDER" > AnyKernel3/version
