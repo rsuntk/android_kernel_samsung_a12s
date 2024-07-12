@@ -60,11 +60,18 @@ jobs:
         	export GIT_ENV_DEFCONFIG="rsuntk-perm-m12nsxx_defconfig"
         elif [[ $DEVICE_VARIANT = 'a12s' ]] && [[ $PRE_SELINUX_STATE = 'false' ]]; then
         	export SELINUX_STATE="Enforcing"
-        	export GIT_ENV_DEFCONFIG="rsuntk-enf-m12nsxx_defconfig"
+        	export GIT_ENV_DEFCONFIG="rsuntk-enf-a12snsxx_defconfig"
         elif [[ $DEVICE_VARIANT = 'm12' ]] && [[ $PRE_SELINUX_STATE = 'false' ]]; then
         	export SELINUX_STATE="Enforcing"
         	export GIT_ENV_DEFCONFIG="rsuntk-enf-m12nsxx_defconfig"
         fi
+        
+        # recheck value
+        echo $KSU_STATE
+        echo $UPLOAD_GZ
+        echo $DEVICE_VARIANT
+        echo $GIT_ENV_DEFCONFIG
+        
         bash $(pwd)/build.sh
         zipName=`cat $(pwd)/zipfile_format.txt` && echo "zipName=$zipName" >> $GITHUB_OUTPUT
       env:

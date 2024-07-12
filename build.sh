@@ -46,12 +46,12 @@ elif [ ! -z $ENV_IS_CI ]; then
 	__DEFCONFIG=$GIT_ENV_DEFCONFIG
 	
 	if [[ $KSU_STATE = 'true' ]]; then
-		FMT="RsuCI-`echo $DEVICE_VARIANT`-KSU_`echo $KSU_NUM`-`echo $SELINUX_STATE`"
 		curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
 		
 		# KernelSU/kernel/Makefile#22
 		KSU_COMMIT_COUNT=$(cd KernelSU && git rev-list --count HEAD)
 		export KSU_VERSION=$(expr 10200 + $KSU_COMMIT_COUNT)
+		FMT="RsuCI-`echo $DEVICE_VARIANT`-KSU_`echo $KSU_NUM`-`echo $SELINUX_STATE`"
 	else
 		FMT="RsuCI-`echo $DEVICE_VARIANT`-`echo $SELINUX_STATE`"
 	fi
