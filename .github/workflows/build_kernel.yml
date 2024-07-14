@@ -10,6 +10,7 @@ on:
         options:
         - a12s
         - m12
+        - unified
       GIT_KERNELSU_SUPPORT:
         description: 'KernelSU support'
         required: true
@@ -64,13 +65,13 @@ jobs:
         elif [[ $DEVICE_VARIANT = 'm12' ]] && [[ $PRE_SELINUX_STATE = 'false' ]]; then
         	export SELINUX_STATE="Enforcing"
         	export GIT_ENV_DEFCONFIG="rsuntk-enf-m12nsxx_defconfig"
+        elif [[ $DEVICE_VARIANT = 'unified' ]] && [[ $PRE_SELINUX_STATE = 'false' ]]; then
+        	export SELINUX_STATE="Enforcing"
+        	export GIT_ENV_DEFCONFIG="rsuntk-enf-unified_defconfig"
+        elif [[ $DEVICE_VARIANT = 'unified' ]] && [[ $PRE_SELINUX_STATE = 'true' ]]; then
+        	export SELINUX_STATE="Permissive"
+        	export GIT_ENV_DEFCONFIG="rsuntk-enf-unified_defconfig"
         fi
-        
-        # recheck value
-        echo $KSU_STATE
-        echo $UPLOAD_GZ
-        echo $DEVICE_VARIANT
-        echo $GIT_ENV_DEFCONFIG
         
         bash $(pwd)/build.sh
         zipName=`cat $(pwd)/zipfile_format.txt` && echo "zipName=$zipName" >> $GITHUB_OUTPUT

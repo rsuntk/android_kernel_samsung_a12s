@@ -7,7 +7,7 @@
 export PLATFORM_VERSION=13
 export ANDROID_MAJOR_VERSION=t
 export ARCH=arm64
-export RSU_ENV=/rsuntk0
+export RSU_ENV=/rsuntk
 export CLANG_VERSION=11
 export SHOW_TC_PATH=y
 export DATE=$(date +'%Y%m%d%H%M%S')
@@ -51,7 +51,7 @@ elif [ ! -z $ENV_IS_CI ]; then
 		# KernelSU/kernel/Makefile#22
 		KSU_COMMIT_COUNT=$(cd KernelSU && git rev-list --count HEAD)
 		export KSU_VERSION=$(expr 10200 + $KSU_COMMIT_COUNT)
-		FMT="RsuCI-`echo $DEVICE_VARIANT`-KSU_`echo $KSU_NUM`-`echo $SELINUX_STATE`"
+		FMT="RsuCI-`echo $DEVICE_VARIANT`-KSU_`echo $KSU_VERSION`-`echo $SELINUX_STATE`"
 	else
 		FMT="RsuCI-`echo $DEVICE_VARIANT`-`echo $SELINUX_STATE`"
 	fi
@@ -71,6 +71,7 @@ export SHOW_TC_PATH=n
 make --no-silent --jobs $(nproc --all) CC=$__CC LD=$__LD CROSS_COMPILE=$__CROSS_COMPILE CLANG_TRIPLE=$__CLANG_TRIPLE -C $(pwd) O=$(pwd)/out ARCH=arm64
 
 if [ ! -z $ENV_IS_CI ]; then
+	mv $(pwd)/out/arch/$ARCH/boot/Image $(pwd)/Rissu/AnyKernel3/Image
 	cd Rissu
 	bash mk_version
 	cd AnyKernel3
