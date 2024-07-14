@@ -90,5 +90,5 @@ jobs:
       if: env.PRE_UPLOAD_IMAGE_GZ == true
       uses: actions/upload-artifact@v4
       with:
-        name: Image
+        name: Image-gz
         path: android_kernel_samsung_a12s/Rissu/*.gz

@@ -72,7 +72,7 @@ make --no-silent --jobs $(nproc --all) CC=$__CC LD=$__LD CROSS_COMPILE=$__CROSS_
 
 if [ ! -z $ENV_IS_CI ]; then
 	mv $(pwd)/out/arch/$ARCH/boot/Image $(pwd)/Rissu/AnyKernel3/Image
-	cd Rissu
+	cd $(pwd)/Rissu
 	bash mk_version
 	cd AnyKernel3
 	zip -6 -r $(pwd)/Rissu/$FMT *
