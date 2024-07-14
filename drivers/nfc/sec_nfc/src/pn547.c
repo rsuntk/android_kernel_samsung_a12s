@@ -72,7 +72,7 @@
 #include "pn547.h"
 #include "cold_reset.h"
 #ifdef CONFIG_SEC_NFC_LOGGER
-#include "nfc_logger/nfc_logger.h"
+#include "nfc_logger.h"
 #endif
 
 #ifdef CONFIG_SEC_KUNIT

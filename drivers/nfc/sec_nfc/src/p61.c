@@ -49,10 +49,10 @@
 #include "pn547.h"
 #include "cold_reset.h"
 #ifdef CONFIG_SEC_NFC_LOGGER
-#include "./nfc_logger/nfc_logger.h"
+#include "nfc_logger.h"
 #endif
 #if defined(CONFIG_ESE_SECURE) && defined(CONFIG_ESE_USE_TZ_API)
-#include "../misc/tzdev/include/tzdev/tee_client_api.h"
+#include "tee_client_api.h"
 #endif
 
 extern long  pn547_dev_ioctl(struct file *filp, unsigned int cmd,
