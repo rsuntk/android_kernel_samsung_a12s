@@ -1,4 +1,5 @@
 # Kernel Source for A12s (a12snsxx) and M12 (m12nsxx)
+> This kernel is now part of Yukiprjkt and Rissu-Projekt.
 
 ## Common specifications
 Parts    | Name
