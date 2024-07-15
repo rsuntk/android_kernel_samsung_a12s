@@ -70,7 +70,7 @@ jobs:
         	export GIT_ENV_DEFCONFIG="rsuntk-enf-unified_defconfig"
         elif [[ $DEVICE_VARIANT = 'unified' ]] && [[ $PRE_SELINUX_STATE = 'true' ]]; then
         	export SELINUX_STATE="Permissive"
-        	export GIT_ENV_DEFCONFIG="rsuntk-enf-unified_defconfig"
+        	export GIT_ENV_DEFCONFIG="rsuntk-perm-unified_defconfig"
         fi
         
         bash $(pwd)/build.sh
