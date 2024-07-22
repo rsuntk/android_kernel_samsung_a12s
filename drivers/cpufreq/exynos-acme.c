@@ -1410,7 +1410,10 @@ static __init int init_domain(struct exynos_cpufreq_domain *domain,
 	/* Initialize frequency scaling */
 	domain->max_freq = cal_dfs_get_max_freq(domain->cal_id);
 	domain->min_freq = cal_dfs_get_min_freq(domain->cal_id);
-
+  /*Chatur, Carlos Burero & physwizz*/
+ /*Overclocking little cores to 2.2GHz*/
+static unsigned long arg_cpu_max_c1 = 2210000; /*max_cpu_freq=2.2 GHz for little cores*/
+	
 	/*
 	 * If max-freq property exists in device tree, max frequency is
 	 * selected to smaller one between the value defined in device
