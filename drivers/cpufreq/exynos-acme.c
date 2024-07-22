@@ -28,6 +28,7 @@
 
 #include <soc/samsung/cal-if.h>
 #include <soc/samsung/ect_parser.h>
+#include <soc/samsung/exynos-dm.h>
 #include <soc/samsung/exynos-cpuhp.h>
 #include <soc/samsung/exynos-cpupm.h>
 #include <soc/samsung/exynos-alt.h>
@@ -1053,8 +1054,10 @@ void sec_bootstat_get_cpuinfo(int *freq, int *online)
 		domain = find_domain(cpu);
 		if (!domain)
 			continue;
-		pr_info("%s, dm type = %d\n", __func__, domain->dm_type);
-		cluster = domain->dm_type;
+		pr_err("%s, dm type = %d\n", __func__, domain->dm_type);
+		cluster = 0;
+		if (domain->dm_type == DM_CPU_CL1)
+			cluster = 1;
 
 		freq[cluster] = get_freq(domain);
 	}
@@ -1370,6 +1373,88 @@ static int init_dm(struct exynos_cpufreq_domain *domain,
 	return register_exynos_dm_freq_scaler(domain->dm_type, dm_scaler);
 }
 
+
+
+/*physwizz underclocking*/
+/*Underclocking little cores to 247MHz*/
+static unsigned long arg_cpu_min_c1 = 247000; 
+static int __init cpufreq_read_cpu_min_c1(char *cpu_min_c1) /*integer remains in memory after function call*/
+{
+	unsigned long ui_khz;
+	int ret;
+
+	ret = kstrtoul(cpu_min_c1, 0, &ui_khz); /*convert cpu_min_c1 string to unsigned long variable ui_khz*/
+	if (ret)
+		return -EINVAL;
+
+	arg_cpu_min_c1 = ui_khz;
+	printk("cpu_min_c1=%lu\n", arg_cpu_min_c1); 
+	return ret;
+}
+__setup("cpu_min_c1=", cpufreq_read_cpu_min_c1);
+
+/*Underclocking big cores to 247MHz*/
+unsigned long arg_cpu_min_c2 = 247000; 
+
+static __init int cpufreq_read_cpu_min_c2(char *cpu_min_c2)
+{
+	unsigned long ui_khz;
+	int ret;
+
+	ret = kstrtoul(cpu_min_c2, 0, &ui_khz);
+	if (ret)
+		return -EINVAL;
+
+	arg_cpu_min_c2 = ui_khz;
+	printk("cpu_min_c2=%lu\n", arg_cpu_min_c2);
+	return ret;
+}
+__setup("cpu_min_c2=", cpufreq_read_cpu_min_c2);
+
+
+/*Chatur, Carlos Burero & physwizz*/
+/*Overclocking little cores to 2.2GHz*/
+static unsigned long arg_cpu_max_c1 = 2210000; /*max_cpu_freq=2.2 GHz for little cores*/
+
+static int __init cpufreq_read_cpu_max_c1(char *cpu_max_c1) /*integer remains in memory after function call*/
+{
+	unsigned long ui_khz;
+	int ret;
+
+	ret = kstrtoul(cpu_max_c1, 0, &ui_khz); /*convert cpu_max_c1 string to unsigned long variable ui_khz*/
+	if (ret)
+		return -EINVAL;
+
+	arg_cpu_max_c1 = ui_khz;
+	printk("cpu_max_c1=%lu\n", arg_cpu_max_c1); 
+	return ret;
+}
+__setup("cpu_max_c1=", cpufreq_read_cpu_max_c1);
+
+/*Overclocking big cores to 2.2GHz*/
+unsigned long arg_cpu_max_c2 = 2210000; /*max_cpu_freq=2.2 GHz*/
+
+static __init int cpufreq_read_cpu_max_c2(char *cpu_max_c2)
+{
+	unsigned long ui_khz;
+	int ret;
+
+	ret = kstrtoul(cpu_max_c2, 0, &ui_khz);
+	if (ret)
+		return -EINVAL;
+
+	arg_cpu_max_c2 = ui_khz;
+	printk("cpu_max_c2=%lu\n", arg_cpu_max_c2);
+	return ret;
+}
+__setup("cpu_max_c2=", cpufreq_read_cpu_max_c2);
+
+
+
+
+
+
+
 static __init void init_slack_timer(struct exynos_cpufreq_domain *domain,
 		struct device_node *dn)
 {
@@ -1410,10 +1495,7 @@ static __init int init_domain(struct exynos_cpufreq_domain *domain,
 	/* Initialize frequency scaling */
 	domain->max_freq = cal_dfs_get_max_freq(domain->cal_id);
 	domain->min_freq = cal_dfs_get_min_freq(domain->cal_id);
-  /*Chatur, Carlos Burero & physwizz*/
- /*Overclocking little cores to 2.2GHz*/
-static unsigned long arg_cpu_max_c1 = 2210000; /*max_cpu_freq=2.2 GHz for little cores*/
-	
+
 	/*
 	 * If max-freq property exists in device tree, max frequency is
 	 * selected to smaller one between the value defined in device
@@ -1425,6 +1507,24 @@ static unsigned long arg_cpu_max_c1 = 2210000; /*max_cpu_freq=2.2 GHz for little
 	if (!of_property_read_u32(dn, "min-freq", &val))
 		domain->min_freq = max(domain->min_freq, val);
 
+
+ /*id==0 for little  id==1 for big*/
+
+	if (domain->id == 0) {
+		domain->max_freq = arg_cpu_max_c1;
+		domain->min_freq = arg_cpu_min_c1;
+	} else if (domain->id == 1) {
+		domain->max_freq = arg_cpu_max_c2;
+		domain->min_freq = arg_cpu_min_c2;
+	}
+
+	/* Default QoS for user */
+	//if (!of_property_read_u32(dn, "user-default-qos", &val))
+	//	domain->user_default_qos = val;
+
+
+
+
 	/* If this domain has boost freq, change max */
 	val = exynos_pstate_get_boost_freq(cpumask_first(&domain->cpus));
 	if (val > domain->max_freq)
@@ -1432,6 +1532,11 @@ static unsigned long arg_cpu_max_c1 = 2210000; /*max_cpu_freq=2.2 GHz for little
 
 	if (of_property_read_bool(dn, "need-awake"))
 		domain->need_awake = true;
+
+
+
+
+
 
 	domain->boot_freq = cal_dfs_get_boot_freq(domain->cal_id);
 	domain->resume_freq = cal_dfs_get_resume_freq(domain->cal_id);
