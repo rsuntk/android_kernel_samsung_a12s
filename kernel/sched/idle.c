@@ -5,6 +5,7 @@
  * (NOTE: these are not related to SCHED_IDLE batch scheduled
  *        tasks which are handled in sched/fair.c )
  */
+#include <linux/cpu_pm.h>
 #include "sched.h"
 
 #include <trace/events/power.h>
@@ -235,6 +236,7 @@ static void do_idle(void)
 	 */
 
 	__current_set_polling();
+	cpu_pm_enter_pre();
 	tick_nohz_idle_enter();
 
 	while (!need_resched()) {
@@ -273,6 +275,7 @@ static void do_idle(void)
 	 * This is required because for polling idle loops we will not have had
 	 * an IPI to fold the state for us.
 	 */
+	cpu_pm_exit_post();
 	preempt_set_need_resched();
 	tick_nohz_idle_exit();
 	__current_clr_polling();
