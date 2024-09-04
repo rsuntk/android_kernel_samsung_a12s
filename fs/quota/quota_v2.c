@@ -98,7 +98,6 @@ static int v2_read_file_info(struct super_block *sb, int type)
 	ssize_t size;
 	unsigned int version;
 	int ret;
-
 	down_read(&dqopt->dqio_sem);
 	ret = v2_read_header(sb, type, &dqhead);
 	if (ret < 0)
@@ -109,7 +108,6 @@ static int v2_read_file_info(struct super_block *sb, int type)
 		ret = -EINVAL;
 		goto out;
 	}
-
 	size = sb->s_op->quota_read(sb, type, (char *)&dinfo,
 	       sizeof(struct v2_disk_dqinfo), V2_DQINFOOFF);
 	if (size != sizeof(struct v2_disk_dqinfo)) {
@@ -165,17 +163,17 @@ static int v2_read_file_info(struct super_block *sb, int type)
 		quota_error(sb, "Number of blocks too big for quota file size (%llu > %llu).",
 		    (loff_t)qinfo->dqi_blocks << qinfo->dqi_blocksize_bits,
 		    i_size_read(sb_dqopt(sb)->files[type]));
-		goto out;
+		goto out_free;
 	}
 	if (qinfo->dqi_free_blk >= qinfo->dqi_blocks) {
 		quota_error(sb, "Free block number too big (%u >= %u).",
 			    qinfo->dqi_free_blk, qinfo->dqi_blocks);
-		goto out;
+		goto out_free;
 	}
 	if (qinfo->dqi_free_entry >= qinfo->dqi_blocks) {
 		quota_error(sb, "Block with free entry too big (%u >= %u).",
 			    qinfo->dqi_free_entry, qinfo->dqi_blocks);
-		goto out;
+		goto out_free;
 	}
 	ret = 0;
 out_free:

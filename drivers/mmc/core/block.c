@@ -1834,9 +1834,6 @@ static void mmc_blk_cqe_complete_rq(struct mmc_queue *mq, struct request *req)
 	unsigned long flags;
 	bool put_card;
 	int err;
-	enum mmc_issue_type issue_type;
-
-	issue_type = mmc_issue_type(mq, req);
 
 	mmc_cqe_post_req(host, mrq);
 
@@ -3568,4 +3565,3 @@ module_exit(mmc_blk_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Multimedia Card (MMC) block device driver");
-
