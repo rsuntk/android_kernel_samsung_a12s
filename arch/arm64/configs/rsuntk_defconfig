@@ -1,15 +1,15 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 4.19.111 Kernel Configuration
+# Linux/arm64 4.19.245 Kernel Configuration
 #
 
 #
-# Compiler: Android (5484270 based on r353983c) clang version 9.0.3 (https://android.googlesource.com/toolchain/clang 745b335211bb9eadfa6aa6301f84715cee4b37c5) (https://android.googlesource.com/toolchain/llvm 60cf23e54e46c807513f7a36d0a7b777920b5881) (based on LLVM 9.0.3svn)
+# Compiler: Android (6443078 based on r383902) clang version 11.0.1 (https://android.googlesource.com/toolchain/llvm-project b397f81060ce6d701042b782172ed13bee898b79
 #
 CONFIG_GCC_VERSION=0
 CONFIG_CC_IS_CLANG=y
 CONFIG_LD_IS_LLD=y
-CONFIG_CLANG_VERSION=90003
+CONFIG_CLANG_VERSION=110001
 CONFIG_IRQ_WORK=y
 CONFIG_BUILDTIME_EXTABLE_SORT=y
 CONFIG_THREAD_INFO_IN_TASK=y
@@ -4294,7 +4294,6 @@ CONFIG_ANDROID_SWITCH=y
 # Gasket devices
 #
 # CONFIG_XIL_AXIS_FIFO is not set
-# CONFIG_EROFS_FS is not set
 # CONFIG_GOLDFISH is not set
 # CONFIG_CHROME_PLATFORMS is not set
 CONFIG_CLKDEV_LOOKUP=y
@@ -5329,6 +5328,7 @@ CONFIG_F2FS_SEC_BLOCK_OPERATIONS_DEBUG=y
 CONFIG_F2FS_FS_COMPRESSION=y
 CONFIG_F2FS_FS_LZO=y
 CONFIG_F2FS_FS_LZ4=y
+CONFIG_EROFS_FS=y
 # CONFIG_FS_DAX is not set
 CONFIG_FS_POSIX_ACL=y
 CONFIG_EXPORTFS=y
