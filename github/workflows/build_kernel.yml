@@ -1,0 +1,60 @@
+name: Build Kernel
+on:
+  workflow_dispatch:
+    inputs:
+      GIT_DEV_VAR:
+        description: 'Device variant'
+        required: true
+        default: a12s
+        type: choice
+        options:
+        - a12s
+        - m12
+        - unified
+      GIT_KERNELSU_SUPPORT:
+        description: 'KernelSU support'
+        required: true
+        type: boolean
+      GIT_PERMISSIVE:
+        description: 'SELinux Permissive'
+        required: true
+        type: boolean
+      GIT_UPLOAD_IMAGE_GZ:
+        description: 'Upload Image.gz file'
+        required: true
+        type: boolean
+        
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: TG
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: android_kernel_samsung_a12s
+        fetch-depth: 0
+    - name: Prepare dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl curl lz4 -y
+        sudo aptitude install libssl-dev -y
+    - name: Fetch toolchains
+      run: |
+        mkdir toolchains
+        cd toolchains
+        git clone https://gitlab.com/Rissu-Projekt/toolchains/clang-toolchains.git clang-11
+        git clone https://gitlab.com/Rissu-Projekt/toolchains/aarch64-linux-android.git google
+      working-directory: android_kernel_samsung_a12s
+    - name: Build kernel
+      run: |
+        curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+        export DEFCONFIG=rsuntk_ksu-defconfig
+        export CROSS_COMPILE=$(pwd)/toolchains/google/bin/aarch64-linux-android-
+        export PATH=$(pwd)/toolchains/clang-11/bin:$PATH
+
+        bash build_kernel.sh
+    - name: Upload .gz
+      uses: actions/upload-artifact@v4
+      with:
+        name: Image-gz
+        path: android_kernel_samsung_a12s/out/arch/arm64/*.gz
