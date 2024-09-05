@@ -25,7 +25,7 @@ jobs:
     - name: Build kernel
       run: |
         curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
-        export DEFCONFIG=rsuntk_ksu-defconfig
+        export DEFCONFIG="rsuntk-ksu_defconfig"
         export CROSS_COMPILE=$(pwd)/toolchains/google/bin/aarch64-linux-android-
         export PATH=$(pwd)/toolchains/clang-11/bin:$PATH
         bash build_kernel.sh
