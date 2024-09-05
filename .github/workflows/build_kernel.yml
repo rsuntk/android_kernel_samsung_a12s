@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         path: android_kernel_samsung_a12s
-        fetch-depth: 0
+        fetch-depth: 1
     - name: Prepare dependencies
       run: |
         sudo apt update -y
