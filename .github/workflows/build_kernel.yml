@@ -28,6 +28,7 @@ jobs:
         export DEFCONFIG="rsuntk-ksu_defconfig"
         export CROSS_COMPILE=$(pwd)/toolchains/google/bin/aarch64-linux-android-
         export PATH=$(pwd)/toolchains/clang-11/bin:$PATH
+        export ENV_IS_CI="true"
         bash build_kernel.sh
       working-directory: android_kernel_samsung_a12s
     - name: Upload .gz
