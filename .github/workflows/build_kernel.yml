@@ -35,4 +35,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Image-gz
-        path: android_kernel_samsung_a12s/out/arch/arm64/*.gz
+        path: android_kernel_samsung_a12s/out/arch/arm64/boot/*.gz
