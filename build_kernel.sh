@@ -113,9 +113,11 @@ if [ -e $IMAGE ]; then
 
 	if [ -e $(pwd)/$zip_name ]; then
 		pr_info "Zip created. file: $(pwd)/$zip_name"
-		pr_info "Cleaning out/ dir .."
-		rm -rR out -f;
-		pr_info "Done!"
+  		if [ -z $ENV_IS_CI ]; then
+			pr_info "Cleaning out/ dir .."
+			rm -rR out -f;
+			pr_info "Done!"
+  		fi
 		if [ -d $RES ]; then
 			pr_info "Cleaning result/ dir .."
 			rm -rf $RES
