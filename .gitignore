@@ -86,6 +86,11 @@ modules.builtin
 !.clang-format
 
 #
+# don't ignore .github
+#
+!.github/workflows
+
+#
 # Generated include files
 #
 include/config
