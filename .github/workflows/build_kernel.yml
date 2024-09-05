@@ -1,28 +1,6 @@
 name: Build Kernel
 on:
   workflow_dispatch:
-    inputs:
-      GIT_DEV_VAR:
-        description: 'Device variant'
-        required: true
-        default: a12s
-        type: choice
-        options:
-        - a12s
-        - m12
-        - unified
-      GIT_KERNELSU_SUPPORT:
-        description: 'KernelSU support'
-        required: true
-        type: boolean
-      GIT_PERMISSIVE:
-        description: 'SELinux Permissive'
-        required: true
-        type: boolean
-      GIT_UPLOAD_IMAGE_GZ:
-        description: 'Upload Image.gz file'
-        required: true
-        type: boolean
         
 jobs:
   build:
