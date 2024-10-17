@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 4.19.111 Kernel Configuration
+# Linux/arm64 4.19.200 Kernel Configuration
 #
 
 #
@@ -28,10 +28,10 @@ CONFIG_KSU=y
 
 #
 # SELinux State
-#
-CONFIG_SECURITY_SELINUX_ALWAYS_PERMISSIVE=y
+# Always permissive
+CONFIG_SECURITY_SELINUX_DEVELOP=y
 # CONFIG_SECURITY_SELINUX_ALWAYS_ENFORCE is not set
-
+CONFIG_SECURITY_SELINUX_ALWAYS_PERMISSIVE=y
 #
 # General setup
 #

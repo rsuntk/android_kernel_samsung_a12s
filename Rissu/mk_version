@@ -10,7 +10,7 @@ BORDER="-------------------------------------------------"
 
 printf "
 $BORDER
-Name	:	Rissu-CI
+Name	:	HeromWC-CI
 $BORDER
 Device	:	$DEVICE_VARIANT
 $BORDER
