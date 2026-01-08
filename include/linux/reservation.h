@@ -46,6 +46,8 @@
 #include <linux/rcupdate.h>
 
 extern struct ww_class reservation_ww_class;
+extern struct lock_class_key reservation_seqcount_class;
+extern const char reservation_seqcount_string[];
 
 /**
  * struct reservation_object_list - a list of shared fences
@@ -69,6 +71,7 @@ struct reservation_object_list {
  */
 struct reservation_object {
 	struct ww_mutex lock;
+	seqcount_t seq;
 
 	struct dma_fence __rcu *fence_excl;
 	struct reservation_object_list __rcu *fence;
