@@ -35,5 +35,5 @@ obj-$(CONFIG_PABLO_V8_1_0) += is-subdev-sensor_vc2.o
 obj-$(CONFIG_PABLO_V8_1_0) += is-subdev-sensor_vc3.o
 endif
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/include

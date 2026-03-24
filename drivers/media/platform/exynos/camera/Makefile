@@ -62,41 +62,41 @@ obj-$(CONFIG_VIDEO_EXYNOS_PABLO_ISP) += interface/
 obj-$(CONFIG_VIDEO_EXYNOS_PABLO_ISP) += hardware/
 obj-$(CONFIG_VIDEO_EXYNOS_PABLO_ISP) += interface/
 
-subdir-ccflags-y := -Idrivers/media/platform/exynos/camera
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/include
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/interface
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/hardware
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/hardware/api
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/vendor
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/sensor/csi
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/sensor/module_framework
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera/vendor/mcd/preprocessor
-subdir-ccflags-$(CONFIG_PABLO_V7_0_0) += -Idrivers/media/platform/exynos/camera/ischain/is-v7_0_0
-subdir-ccflags-$(CONFIG_PABLO_V8_0_0) += -Idrivers/media/platform/exynos/camera/ischain/is-v8_0_0
-subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -Idrivers/media/platform/exynos/camera/ischain/is-v8_1_0
-subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -Idrivers/media/platform/exynos/camera/ischain/is-v8_10_0
-subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -Idrivers/media/platform/exynos/camera/ischain/is-v8_20_0
+subdir-ccflags-y := -I $(srctree)/drivers/media/platform/exynos/camera
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/include
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/interface
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/hardware
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/hardware/api
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/vendor
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/sensor/csi
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/sensor/module_framework
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd/preprocessor
+subdir-ccflags-$(CONFIG_PABLO_V7_0_0) += -I $(srctree)/drivers/media/platform/exynos/camera/ischain/is-v7_0_0
+subdir-ccflags-$(CONFIG_PABLO_V8_0_0) += -I $(srctree)/drivers/media/platform/exynos/camera/ischain/is-v8_0_0
+subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -I $(srctree)/drivers/media/platform/exynos/camera/ischain/is-v8_1_0
+subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -I $(srctree)/drivers/media/platform/exynos/camera/ischain/is-v8_10_0
+subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -I $(srctree)/drivers/media/platform/exynos/camera/ischain/is-v8_20_0
 
-subdir-ccflags-$(CONFIG_VENDER_DEFAULT) += -Idrivers/media/platform/exynos/camera/vendor/default
+subdir-ccflags-$(CONFIG_VENDER_DEFAULT) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/default
 ifeq ($(CONFIG_VENDER_DEFAULT),y)
-subdir-ccflags-$(CONFIG_PABLO_V7_0_0) += -Idrivers/media/platform/exynos/camera/vendor/default/v7_0_0
-subdir-ccflags-$(CONFIG_PABLO_V8_0_0) += -Idrivers/media/platform/exynos/camera/vendor/default/v8_0_0
-subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -Idrivers/media/platform/exynos/camera/vendor/default/v8_1_0
-subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -Idrivers/media/platform/exynos/camera/vendor/default/v8_10_0
-subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -Idrivers/media/platform/exynos/camera/vendor/default/v8_20_0
+subdir-ccflags-$(CONFIG_PABLO_V7_0_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/default/v7_0_0
+subdir-ccflags-$(CONFIG_PABLO_V8_0_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/default/v8_0_0
+subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/default/v8_1_0
+subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/default/v8_10_0
+subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/default/v8_20_0
 endif
 
-subdir-ccflags-$(CONFIG_VENDER_MCD) += -Idrivers/media/platform/exynos/camera/vendor/mcd
+subdir-ccflags-$(CONFIG_VENDER_MCD) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd
 ifeq ($(CONFIG_VENDER_MCD),y)
-subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -Idrivers/media/platform/exynos/camera/vendor/mcd/v8_1_0
-subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -Idrivers/media/platform/exynos/camera/vendor/mcd/v8_10_0
-subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -Idrivers/media/platform/exynos/camera/vendor/mcd/v8_20_0
+subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd/v8_1_0
+subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd/v8_10_0
+subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd/v8_20_0
 endif
 
-subdir-ccflags-$(CONFIG_VENDER_MCD_V2) += -Idrivers/media/platform/exynos/camera/vendor/mcd_v2
+subdir-ccflags-$(CONFIG_VENDER_MCD_V2) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd_v2
 ifeq ($(CONFIG_VENDER_MCD_V2),y)
-subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -Idrivers/media/platform/exynos/camera/vendor/mcd_v2/v8_1_0
-subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -Idrivers/media/platform/exynos/camera/vendor/mcd_v2/v8_10_0
-subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -Idrivers/media/platform/exynos/camera/vendor/mcd_v2/v8_20_0
+subdir-ccflags-$(CONFIG_PABLO_V8_1_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd_v2/v8_1_0
+subdir-ccflags-$(CONFIG_PABLO_V8_10_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd_v2/v8_10_0
+subdir-ccflags-$(CONFIG_PABLO_V8_20_0) += -I $(srctree)/drivers/media/platform/exynos/camera/vendor/mcd_v2/v8_20_0
 endif
-subdir-ccflags-y += -Idrivers/media/platform/exynos/camera-pp
+subdir-ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera-pp

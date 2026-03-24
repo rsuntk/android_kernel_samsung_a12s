@@ -7,4 +7,4 @@
 
 obj-$(CONFIG_CAMERA_PP_STR_V1_0_0_OBJ)	+= camerapp-str-sfr-api-v100.o
 
-ccflags-y += -Idrivers/media/platform/exynos/camera-pp
+ccflags-y += -I $(srctree)/drivers/media/platform/exynos/camera-pp

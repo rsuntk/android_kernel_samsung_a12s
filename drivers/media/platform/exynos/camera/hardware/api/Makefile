@@ -14,8 +14,8 @@ obj-$(CONFIG_MC_SCALER_V8_20) += is-hw-api-mcscaler-v8_20-v8_21.o \
 obj-$(CONFIG_PDP_V1_0) += is-hw-api-pdp-v1_0.o
 obj-$(CONFIG_PDP_V1_0_0) += is-hw-api-pdp-v1_0_0.o
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/include
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/hardware
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/hardware/api
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/vendor
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/hardware
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/hardware/api
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/vendor

@@ -56,8 +56,8 @@ obj-$(CONFIG_CAMERA_CIS_HI1336_OBJ) += is-cis-hi1336.o
 obj-$(CONFIG_CAMERA_CIS_GM2_OBJ) += is-cis-gm2.o
 obj-$(CONFIG_CAMERA_CIS_GC02M1_OBJ) += is-cis-gc02m1.o
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/include
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/vendor
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/sensor/module_framework
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/sensor/
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/vendor
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/sensor/module_framework
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/sensor/

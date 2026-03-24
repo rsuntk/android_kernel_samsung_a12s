@@ -15,6 +15,6 @@ ifneq ($(CONFIG_VENDER_MCD),y)
 obj-y += module_framework/ois/
 endif
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/include
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/vendor
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/vendor

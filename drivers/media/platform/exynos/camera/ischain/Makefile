@@ -9,4 +9,4 @@ endif
 obj-$(CONFIG_EXYNOS_PABLO_ISP) += is-v8_10_0/
 obj-$(CONFIG_EXYNOS_PABLO_ISP) += is-v8_20_0/
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/include

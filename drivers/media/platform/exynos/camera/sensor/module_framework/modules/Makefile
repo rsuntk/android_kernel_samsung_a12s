@@ -40,8 +40,8 @@ obj-$(CONFIG_CAMERA_CIS_VIRTUAL_OBJ) += is-device-module-virtual.o
 obj-$(CONFIG_CAMERA_CIS_IMX316_OBJ) += is-device-module-imx316.o
 obj-$(CONFIG_CAMERA_CIS_IMX516_OBJ) += is-device-module-imx516.o
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/include
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/vendor
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/sensor/module_framework
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/sensor
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/vendor
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/sensor/module_framework
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/sensor

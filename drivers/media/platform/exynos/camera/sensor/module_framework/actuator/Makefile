@@ -17,9 +17,9 @@ obj-$(CONFIG_CAMERA_ACT_ZC533_OBJ) += is-actuator-zc533.o
 obj-$(CONFIG_CAMERA_ACT_ZC569_OBJ) += is-actuator-zc569.o
 obj-$(CONFIG_CAMERA_ACT_FP5529_OBJ) += is-actuator-fp5529.o
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/include
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/vendor
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/hardware/api
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/sensor
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/camera/sensor/module_framework
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/vendor
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/hardware/api
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/sensor
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/camera/sensor/module_framework

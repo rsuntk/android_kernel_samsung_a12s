@@ -11,6 +11,6 @@ obj-$(CONFIG_AF_HOST_CONTROL)	+= is-device-af.o
 obj-$(CONFIG_OIS_USE_RUMBA_S4) += is-device-ois_s4.o
 obj-$(CONFIG_OIS_USE_RUMBA_SA) += is-device-ois_sa.o
 
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/is2
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/is2/include
-EXTRA_CFLAGS += -Idrivers/media/platform/exynos/is2/sensor/module_framework
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/is2
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/is2/include
+EXTRA_CFLAGS += -I $(srctree)/drivers/media/platform/exynos/is2/sensor/module_framework
