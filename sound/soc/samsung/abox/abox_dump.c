@@ -767,7 +767,7 @@ static int abox_dump_add_dai_link(struct device *dev)
 
 	dev_dbg(dev, "%s[%d]\n", __func__, id);
 
-	cancel_delayed_work_sync(&abox_dump_register_card_work);
+	cancel_delayed_work(&abox_dump_register_card_work);
 
 	if (abox_dump_card.num_links <= id) {
 		link = krealloc(abox_dump_card.dai_link,
@@ -796,7 +796,7 @@ static int abox_dump_add_dai_link(struct device *dev)
 	if (abox_dump_card.num_links <= id)
 		abox_dump_card.num_links = id + 1;
 
-	schedule_delayed_work(&abox_dump_register_card_work, HZ);
+	queue_delayed_work(system_unbound_wq, &abox_dump_register_card_work, 2 * HZ);
 
 	return 0;
 }
@@ -812,7 +812,7 @@ static int samsung_abox_dump_probe(struct platform_device *pdev)
 
 	if (id < 0) {
 		abox_dump_card.dev = &pdev->dev;
-		schedule_delayed_work(&abox_dump_register_card_work, 0);
+		queue_delayed_work(system_unbound_wq, &abox_dump_register_card_work, 2 * HZ);
 	} else {
 		info->dev = dev;
 		pm_runtime_no_callbacks(dev);
