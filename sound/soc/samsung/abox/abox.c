@@ -3085,7 +3085,7 @@ static int samsung_abox_probe(struct platform_device *pdev)
 	INIT_LIST_HEAD(&data->iommu_maps);
 
 	data->ipc_workqueue = alloc_ordered_workqueue("abox_ipc",
-			WQ_MEM_RECLAIM);
+			WQ_MEM_RECLAIM | WQ_HIGHPRI);
 	if (!data->ipc_workqueue) {
 		dev_err(dev, "Couldn't create workqueue %s\n", "abox_ipc");
 		return -ENOMEM;
