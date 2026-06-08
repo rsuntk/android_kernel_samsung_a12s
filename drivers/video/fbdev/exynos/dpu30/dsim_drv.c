@@ -472,7 +472,6 @@ int dsim_write_data(struct dsim_device *dsim, u32 id, unsigned long d0, u32 d1, 
 		ret = -EINVAL;
 		goto err_exit;
 	}
-	dsi_write_data_dump(dsim, id, d0, d1);
 
 	reinit_completion(&dsim->ph_wr_comp);
 	dsim_reg_clear_int(dsim->id, DSIM_INTSRC_SFR_PH_FIFO_EMPTY);
