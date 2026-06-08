@@ -100,7 +100,7 @@ run_list(dev, "subnode_4"); pre-configured lcd_pin pinctrl at subnode_1 will be 
 
 */
 
-//#define CONFIG_BOARD_DEBUG
+/* #define CONFIG_BOARD_DEBUG */
 
 #define BOARD_DTS_NAME	"decon_board"
 #if defined(CONFIG_EXYNOS_DPU20)
@@ -109,7 +109,6 @@ run_list(dev, "subnode_4"); pre-configured lcd_pin pinctrl at subnode_1 will be 
 #define PANEL_DTS_NAME	"panel-ddi-info"
 #endif
 #define PANEL_LUT_NAME	"panel-lut"
-#define PANEL_PBA_NODE	"panel_not_connected"
 
 #if defined(CONFIG_BOARD_DEBUG)
 #define dbg_none(fmt, ...)		pr_debug(pr_fmt("%s: %3d: %s: " fmt), BOARD_DTS_NAME, __LINE__, __func__, ##__VA_ARGS__)
@@ -664,14 +663,11 @@ static int skip_list(const char *node_name, const char *type_name)
 {
 	int ret = 0;
 
-	if (STRNEQ(PANEL_PBA_NODE, node_name))
-		ret = 0;
-	else if (!get_boot_lcdconnected() && !STRNEQ("delay", type_name) && !STRNEQ("timer", type_name))
+	if (!get_boot_lcdconnected() && !STRNEQ("delay", type_name) && !STRNEQ("timer", type_name))
 		ret = 1;
 
 	return ret;
 }
-
 
 static int make_list(struct device *dev, struct list_head *lh, const char *name)
 {
@@ -1596,16 +1592,6 @@ static int __init panel_lut_ddi_recommend_init(void)
 	return 0;
 }
 
-int panel_clean_board(struct device *dev)
-{
-	if (!get_boot_lcdconnected())
-	{
-		run_list(dev, PANEL_PBA_NODE);
-	}
-	return 0;
-}
-
-
 static int __init decon_board_init(void)
 {
 	panel_lut_ddi_recommend_init();
@@ -1613,16 +1599,6 @@ static int __init decon_board_init(void)
 	return 0;
 }
 core_initcall(decon_board_init);
-
-static int __init decon_board_late_initcall(void)
-{
-	struct platform_device *pdev = of_find_device_by_path("/panel_drv@0");
-	struct device *dev = pdev ? &(pdev->dev) : NULL;
-	panel_clean_board(dev);
-
-	return 0;
-}
-late_initcall_sync(decon_board_late_initcall);
 
 #ifdef CONFIG_EXYNOS_DECON_LCD_A12S_BLIC_DUAL
 static int a12s_regulator_core_initcall(void)
@@ -1658,3 +1634,4 @@ static int a12s_regulator_core_initcall(void)
 }
 core_initcall(a12s_regulator_core_initcall);
 #endif
+

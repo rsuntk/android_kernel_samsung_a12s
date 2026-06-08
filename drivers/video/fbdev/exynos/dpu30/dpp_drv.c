@@ -1148,7 +1148,6 @@ static int dpp_probe(struct platform_device *pdev)
 #else
 	timer_setup(&dpp->op_timer, dpp_op_timer_handler, 0);
 #endif
-
 	ret = dpp_init_resources(dpp, pdev);
 	if (ret)
 		goto err_clk;

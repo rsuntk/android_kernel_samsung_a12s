@@ -297,11 +297,6 @@ void mipi_lpdt(u32 id, u32 lpdt_on)
 	dsim_reg_set_cmd_transfer_mode(id, lpdt_on);
 }
 
-void mipi_decon_disable(u32 id)
-{
-	decon_update_pwr_state(decon_drvdata[id], DISP_PWR_OFF);
-}
-
 enum dsim_state get_dsim_state(u32 id)
 {
 	struct dsim_device *dsim = get_dsim_drvdata(id);
@@ -329,7 +324,6 @@ static int panel_drv_put_ops(struct exynos_panel_device *panel)
 	mipi_ops.parse_dt = parse_lcd_info;
 	mipi_ops.get_lcd_info = get_lcd_info;
 	mipi_ops.set_lpdt = mipi_lpdt;
-	mipi_ops.decon_disable = mipi_decon_disable;
 
 	v4l2_set_subdev_hostdata(panel->panel_drv_sd, &mipi_ops);
 
@@ -751,4 +745,3 @@ struct exynos_panel_ops common_panel_ops = {
 #endif
 	.mres = common_panel_mres,
 };
-

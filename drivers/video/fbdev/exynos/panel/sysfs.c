@@ -2491,7 +2491,6 @@ static void show_brt_param(struct panel_info *panel_data, int id, int type)
 	}
 }
 
-#if 0
 #ifdef CONFIG_SUPPORT_DIM_FLASH
 static void show_aid_log(struct panel_info *panel_data, int id)
 {
@@ -2701,7 +2700,6 @@ static void show_aid_log(struct panel_info *panel_data, int id)
 	}
 }
 #endif /* CONFIG_SUPPORT_DIM_FLASH */
-#endif
 
 static ssize_t aid_log_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
@@ -2717,12 +2715,11 @@ static ssize_t aid_log_show(struct device *dev,
 
 	print_panel_resource(panel);
 
-#if 0
 	show_aid_log(panel_data, PANEL_BL_SUBDEV_TYPE_DISP);
 #ifdef CONFIG_SUPPORT_HMD
 	show_aid_log(panel_data, PANEL_BL_SUBDEV_TYPE_HMD);
 #endif
-#endif
+
 	return strlen(buf);
 }
 

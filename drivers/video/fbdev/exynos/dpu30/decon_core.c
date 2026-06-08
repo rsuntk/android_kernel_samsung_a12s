@@ -2964,9 +2964,11 @@ static int decon_set_win_config(struct decon_device *decon,
 
 	kthread_queue_work(&decon->up.worker, &decon->up.work);
 
+
 	if (is_decon_win_state_vrr(decon, win_data->config[DECON_WIN_UPDATE_IDX].state) &&
-	(win_data->fps != 0) && (decon->lcd_info->fps != win_data->fps))
-	kthread_flush_worker(&decon->up.worker);
+		(win_data->fps != 0) && (decon->lcd_info->fps != win_data->fps)) {
+		kthread_flush_worker(&decon->up.worker);
+	}
 
 	/**
 	 * The code is moved here because the DPU driver may get a wrong fd
@@ -2997,6 +2999,7 @@ err_prepare:
 	}
 	win_data->retire_fence = -1;
 	win_data->extra.remained_frames = -1;
+
 	for (i = 0; i < decon->dt.max_win; i++)
 		for (j = 0; j < regs->plane_cnt[i]; ++j)
 			decon_free_unused_buf(decon, regs, i, j);
@@ -3251,25 +3254,25 @@ static int decon_ioctl(struct fb_info *info, unsigned int cmd,
 
 	case S3CFB_WIN_CONFIG_OLD:
 	case S3CFB_WIN_CONFIG:
-        argp = (struct decon_win_config_data __user *)arg;
-        DPU_EVENT_LOG(DPU_EVT_WIN_CONFIG, &decon->sd, ktime_set(0, 0));
-        decon_systrace(decon, 'C', "decon_win_config", 1);
-        if (copy_from_user(&win_data,
-                   (struct decon_win_config_data __user *)arg,
-                   sizeof(struct decon_win_config_data))) {
-            ret = -EFAULT;
-            break;
-        }
+		argp = (struct decon_win_config_data __user *)arg;
+		DPU_EVENT_LOG(DPU_EVT_WIN_CONFIG, &decon->sd, ktime_set(0, 0));
+		decon_systrace(decon, 'C', "decon_win_config", 1);
+		if (copy_from_user(&win_data,
+			(struct decon_win_config_data __user *)arg,
+			sizeof(struct decon_win_config_data))) {
+			ret = -EFAULT;
+			break;
+		}
 
-        ret = decon_set_win_config(decon, &win_data);
-        if (ret)
-            break;
+		ret = decon_set_win_config(decon, &win_data);
+		if (ret)
+			break;
 
-        if (copy_to_user((void __user *)arg, &win_data, _IOC_SIZE(cmd))) {
-            ret = -EFAULT;
-            break;
-        }
-        break;
+		if (copy_to_user((void __user *)arg, &win_data, _IOC_SIZE(cmd))) {
+			ret = -EFAULT;
+			break;
+		}
+		break;
 
 	case S3CFB_GET_HDR_CAPABILITIES:
 		ret = decon_get_hdr_capa(decon, &hdr_capa);
@@ -4606,7 +4609,7 @@ static int decon_probe(struct platform_device *pdev)
 	decon_create_timeline(decon, device_name);
 
 	/* systrace */
-	decon_systrace_enable = 1;
+	decon_systrace_enable = 0;
 	decon->systrace.pid = 0;
 
 	/* debug trivial */

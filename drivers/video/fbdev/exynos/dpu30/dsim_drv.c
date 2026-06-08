@@ -53,7 +53,6 @@
 #include "dsim.h"
 #include "./panels/exynos_panel_drv.h"
 
-
 int dsim_log_level = 6;
 
 struct dsim_device *dsim_drvdata[MAX_DSIM_CNT];
@@ -2438,4 +2437,3 @@ RESERVEDMEM_OF_DECLARE(fb_handover, "exynos,fb_handover", fb_handover_setup);
 MODULE_AUTHOR("Yeongran Shin <yr613.shin@samsung.com>");
 MODULE_DESCRIPTION("Samusung EXYNOS DSIM driver");
 MODULE_LICENSE("GPL");
-

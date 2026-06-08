@@ -118,14 +118,6 @@ config SUPPORT_ERRFG_RECOVERY_BY_FB_BLANK
 	tristate "Support ERRFG recovery by fb blank"
 	default n
 
-config SMCDSD_LCD_DEBUG
-	bool "Support LCD_DEBUG"
-	default n
-
-config EXYNOS_DECON_LCD_DUMMY_LCD_V320
-	depends on EXYNOS_DECON_LCD
-	tristate "DUMMY_LCD_V320 LCD driver"
-
 config EXYNOS_DECON_LCD_EA8076_A21S
 	depends on EXYNOS_DECON_LCD
 	tristate "EA8076_A21S LCD driver"
