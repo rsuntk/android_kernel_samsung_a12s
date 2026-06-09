@@ -138,7 +138,7 @@ static int calc_hw_dma_crc(u32 start_addr, u32 block_size)
 
 	/* Polling BIT0 */
 	while (count > 0) {
-		mdelay(1);
+		usleep_range(1 * 1000, 1 * 1000);
 		if (ili_ice_mode_read(0x048006, &busy, sizeof(u8)) < 0)
 			input_err(true, ilits->dev, "%s Read busy error\n", __func__);
 		ILI_DBG("%s busy = %x\n", __func__, busy);
@@ -431,7 +431,7 @@ static int ilitek_tddi_fw_iram_upgrade(u8 *pfw)
 
 	/* Waiting for fw ready sending first cmd */
 	if (!ilits->info_from_hex || (ilits->chip->core_ver < CORE_VER_1410))
-		mdelay(100);
+		msleep(100);
 
 	return ret;
 }
