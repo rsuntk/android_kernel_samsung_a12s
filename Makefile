@@ -720,7 +720,7 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
 else
-KBUILD_CFLAGS   += -O2
+KBUILD_CFLAGS   += -O2 -mtune=cortex-a55 -march=armv8.2-a+crc -march=armv8.2-a+simd
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
