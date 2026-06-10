@@ -764,7 +764,7 @@ static int parse_dt(void)
 		__func__, ilits->area_indicator, ilits->area_navigation, ilits->area_edge);
 
 	ilits->enable_settings_aot = of_property_read_bool(np, "iliteck,enable_settings_aot");
-	ilits->enable_sysinput_enabled = 0;
+	ilits->enable_sysinput_enabled = of_property_read_bool(np, "iliteck,enable_sysinput_enabled");
 	ilits->support_ear_detect = of_property_read_bool(np, "iliteck,support_ear_detect_mode");
 	ilits->prox_lp_scan_enabled = of_property_read_bool(np, "iliteck,prox_lp_scan_enabled");
 	ilits->support_spay_gesture_mode = of_property_read_bool(np, "iliteck,support_spay_gesture_mode");
