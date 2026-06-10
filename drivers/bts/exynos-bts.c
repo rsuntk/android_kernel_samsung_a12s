@@ -2550,8 +2550,7 @@ static int bts_probe(struct platform_device *pdev)
 	if (!int_request_disable)
 		pm_qos_add_request(&exynos_int_qos, PM_QOS_DEVICE_THROUGHPUT, 0);
 #if defined(CONFIG_DEBUG_FS)
-	ret = exynos_bts_debugfs_init();
-	if (ret)
+	if (exynos_bts_debugfs_init())
 		dev_err(btsdev->dev, "exynos_bts_debugfs_init failed\n");
 #endif
 	register_syscore_ops(&exynos_bts_syscore_ops);
