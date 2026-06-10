@@ -7,6 +7,25 @@
 #include <linux/module.h>
 #include <linux/init.h>
 
+#ifndef DEBUG
+
+#ifdef pr_info
+#undef pr_info
+#define pr_info(fmt, ...) no_printk(KERN_INFO fmt, ##__VA_ARGS__)
+#endif
+
+#ifdef pr_debug
+#undef pr_debug
+#define pr_debug(fmt, ...) no_printk(KERN_DEBUG fmt, ##__VA_ARGS__)
+#endif
+
+#ifdef pr_warn
+#undef pr_warn
+#define pr_warn(fmt, ...) no_printk(KERN_DEBUG fmt, ##__VA_ARGS__)
+#endif
+
+#endif
+
 #if IS_ENABLED(CONFIG_SEC_INPUT_BOOSTER_QC) || \
 	IS_ENABLED(CONFIG_SEC_INPUT_BOOSTER_SLSI) || \
 	IS_ENABLED(CONFIG_SEC_INPUT_BOOSTER_MTK)

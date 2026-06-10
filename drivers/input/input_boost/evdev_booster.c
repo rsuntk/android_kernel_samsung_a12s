@@ -7,6 +7,25 @@
 #include <linux/device.h>
 #include <linux/syscalls.h>
 
+#ifndef DEBUG
+
+#ifdef pr_info
+#undef pr_info
+#define pr_info(fmt, ...) no_printk(KERN_INFO fmt, ##__VA_ARGS__)
+#endif
+
+#ifdef pr_debug
+#undef pr_debug
+#define pr_debug(fmt, ...) no_printk(KERN_DEBUG fmt, ##__VA_ARGS__)
+#endif
+
+#ifdef pr_warn
+#undef pr_warn
+#define pr_warn(fmt, ...) no_printk(KERN_DEBUG fmt, ##__VA_ARGS__)
+#endif
+
+#endif
+
 #if IS_ENABLED(CONFIG_SEC_INPUT_BOOSTER)
 spinlock_t ib_ev_lock;
 struct workqueue_struct *ev_unbound_wq;
