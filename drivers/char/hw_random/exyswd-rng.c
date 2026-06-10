@@ -19,7 +19,7 @@
 #include <linux/spinlock.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
-#include <soc/samsung/exynos-smc.h>
+#include <linux/smc.h>
 
 #define HWRNG_RET_OK			0
 #define HWRNG_RET_INVALID_ERROR		1
@@ -33,6 +33,10 @@
 #define EXYRNG_START_UP_SIZE		(4096 + 1)
 #define EXYRNG_RETRY_MAX_COUNT		1000000
 #define EXYRNG_START_UP_TEST_MAX_RETRY	2
+
+#ifdef CONFIG_EXYRNG_FAIL_POLICY_DISABLE
+static bool hwrng_disabled;
+#endif
 
 atomic_t hwrng_suspend_flag;
 atomic_t hwrng_running_flag;
@@ -61,12 +65,17 @@ static inline struct exyswd_rng_dev *to_rng_dev(struct hwrng *rng)
 
 void exynos_swd_test_fail(void)
 {
+#ifdef CONFIG_EXYRNG_FAIL_POLICY_DISABLE
+	hwrng_disabled = true;
+	pr_err("[ExyRNG] disabled for test failures\n");
+#else
 	panic("[ExyRNG] It failed to health tests. It means that it detects "
 	"the malfunction of TRNG(HW) which generates random numbers. If it "
 	"doesn't offer enough entropy, it should not be used. The system "
 	"reset could be a way to solve it. The health tests are designed "
 	"to have the false positive rate of approximately once per billion "
 	"based on min-entropy of TRNG.\n");
+#endif /* CONFIG_EXYRNG_POLICY_RESET */
 }
 
 static int exynos_cm_smc(uint64_t *arg0, uint64_t *arg1,
@@ -116,6 +125,18 @@ static int exynos_swd_startup_test(void)
 		}
 
 		if (ret == HWRNG_RET_TEST_ERROR || ret == HWRNG_RET_TEST_KAT_ERROR) {
+#ifndef CONFIG_EXYRNG_USE_CRYPTOMANAGER
+			if (ret == HWRNG_RET_TEST_KAT_ERROR) {
+				pr_err("[ExyRNG] start-up KAT test failed: %d\n", ret);
+			} else if (test_cnt < EXYRNG_START_UP_TEST_MAX_RETRY) {
+				start_up_size = EXYRNG_START_UP_SIZE;
+				test_cnt++;
+				pr_info("[ExyRNG] It performs start-up test "
+				"again to detect the malfunction of TRNG with "
+				"accuracy\n");
+				continue;
+			}
+#endif
 			exynos_swd_test_fail();
 			return -EFAULT;
 		}
@@ -155,13 +176,22 @@ static int exynos_swd_read(struct hwrng *rng, void *data, size_t max, bool wait)
 	unsigned long running_flag;
 	uint32_t retry_cnt;
 	int ret = HWRNG_RET_OK;
-	struct exyswd_rng_dev *dev = to_rng_dev(rng);
+	struct exyswd_rng_dev *dev;
+
+#ifdef CONFIG_EXYRNG_FAIL_POLICY_DISABLE
+	if (hwrng_disabled) {
+		pr_err("[ExyRNG] disabled for test failures\n");
+		return -EFAULT;
+	}
+#endif
+
+	dev = to_rng_dev(rng);
 
 	spin_lock_irqsave(&rng_running_lock, running_flag);
 	if (atomic_read(&hwrng_suspend_flag) == 1) {
 		atomic_set(&hwrng_running_flag, 0);
 		spin_unlock_irqrestore(&rng_running_lock, running_flag);
-		printk("[ExyRNG] exynos_swd_read is failed because of suspend flag\n");
+		pr_err("[ExyRNG] exynos_swd_read is failed because of suspend flag\n");
 		return -EFAULT;
 	}
 
@@ -237,7 +267,7 @@ static int exynos_swd_read(struct hwrng *rng, void *data, size_t max, bool wait)
 		}
 
 		if (ret == HWRNG_RET_TEST_ERROR) {
-			exyrng_debug("[ExyRNG] failed to continuous test\n");
+			pr_info("[ExyRNG] failed to continuous test\n");
 			ret = -EAGAIN;
 			goto out;
 		}
@@ -304,7 +334,7 @@ static int exyswd_rng_probe(struct platform_device *pdev)
 	rng_dev->rng.read = exynos_swd_read;
 	rng_dev->rng.quality = 500;
 	rng_dev->dev = dev;
-	rng_dev->start_up_test = 1;
+	rng_dev->start_up_test = IS_ENABLED(CONFIG_EXYRNG_FIPS_COMPLIANCE);
 
 	atomic_set(&hwrng_suspend_flag, 0);
 	atomic_set(&hwrng_running_flag, 0);
@@ -333,7 +363,7 @@ static int exyswd_rng_suspend(struct device *dev)
 
 	spin_lock_irqsave(&rng_running_lock, flag);
 	if (atomic_read(&hwrng_running_flag) == 1) {
-		printk("[ExyRNG] exyswd_rng_suspend: hwrng_running_flag is 1.\n");
+		pr_err("[ExyRNG] exyswd_rng_suspend: hwrng_running_flag is 1.\n");
 		ret = -EFAULT;
 		goto out;
 	}
