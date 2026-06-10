@@ -413,9 +413,6 @@ int __set_panel_power(struct panel_device *panel, int power)
 		else
 			panel_do_seqtbl_by_index_nolock(panel, PANEL_I2C_EXIT_SEQ);
 
-		if (unlikely(boot_blic_type == 1))
-			usleep_range(3000, 3100);
-
 		run_list(panel->dev, "panel_power_disable");
 	}
 
