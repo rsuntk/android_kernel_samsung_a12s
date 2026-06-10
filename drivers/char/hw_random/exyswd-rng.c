@@ -19,6 +19,7 @@
 #include <linux/spinlock.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
+#include <linux/arm-smccc.h>
 #include <linux/smc.h>
 
 #define HWRNG_RET_OK			0
