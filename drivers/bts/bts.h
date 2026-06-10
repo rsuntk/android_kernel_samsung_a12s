@@ -19,6 +19,7 @@
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
+#include <linux/rtmutex.h>
 #include <dt-bindings/soc/samsung/exynos-bts.h>
 #include <soc/samsung/exynos-pd.h>
 #include <soc/samsung/bts.h>
@@ -80,7 +81,7 @@ struct bts_device {
 	struct device		*dev;
 
 	spinlock_t		lock;
-	struct mutex		mutex_lock;
+	struct rt_mutex		mutex_lock;
 
 	unsigned int		num_bts;
 	unsigned int		num_scen;
