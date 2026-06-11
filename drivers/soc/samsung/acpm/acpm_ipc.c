@@ -43,10 +43,6 @@ static inline void exynos_rgt_dbg_snapshot_regulator(u32 val, unsigned long long
 	return ;
 }
 #endif
-static bool is_rt_dl_task_policy(void)
-{
-	return current->policy == SCHED_FIFO || current->policy == SCHED_RR || current->policy == SCHED_DEADLINE;
-}
 
 void acpm_ipc_set_waiting_mode(bool mode)
 {
@@ -501,7 +497,7 @@ int acpm_ipc_send_data_sync(unsigned int channel_id, struct ipc_config *cfg)
 	return ret;
 }
 
-int __acpm_ipc_send_data(unsigned int channel_id, struct ipc_config *cfg, bool w_mode)
+static int __acpm_ipc_send_data(unsigned int channel_id, struct ipc_config *cfg)
 {
 	unsigned int front;
 	unsigned int rear;
@@ -589,7 +585,7 @@ retry:
 					continue;
 				}
 			} else {
-				if (w_mode)
+				if (preemptible())
 					usleep_range(50, 100);
 				else
 					udelay(10);
@@ -630,7 +626,7 @@ int acpm_ipc_send_data(unsigned int channel_id, struct ipc_config *cfg)
 {
 	int ret;
 
-	ret = __acpm_ipc_send_data(channel_id, cfg, false);
+	ret = __acpm_ipc_send_data(channel_id, cfg);
 
 	return ret;
 }
@@ -639,10 +635,7 @@ int acpm_ipc_send_data_lazy(unsigned int channel_id, struct ipc_config *cfg)
 {
 	int ret;
 
-	if (is_rt_dl_task_policy())
-		ret = __acpm_ipc_send_data(channel_id, cfg, true);
-	else
-		ret = __acpm_ipc_send_data(channel_id, cfg, false);
+	ret = __acpm_ipc_send_data(channel_id, cfg);
 
 	return ret;
 }
