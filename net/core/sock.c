@@ -702,7 +702,7 @@ out:
 }
 // SEC_PRODUCT_FEATURE_KNOX_SUPPORT_NPA {
 /** The function sets the domain name associated with the socket. **/
-static int sock_set_domain_name(struct sock *sk, char __user *optval,
+static int sock_set_domain_name(struct sock *sk, sockptr_t optval,
 				int optlen)
 {
 	int ret = -EADDRNOTAVAIL;
@@ -718,7 +718,7 @@ static int sock_set_domain_name(struct sock *sk, char __user *optval,
 	memset(domain, 0, sizeof(domain));
 
 	ret = -EFAULT;
-	if (copy_from_user(domain, optval, optlen))
+	if (copy_from_sockptr(domain, optval, optlen))
 		goto out;
 	memcpy(sk->domain_name,domain, sizeof(sk->domain_name)-1);
 	ret = 0;
@@ -728,7 +728,7 @@ out:
 }
 
 /** The function sets the uid associated with the dns socket. **/
-static int sock_set_dns_uid(struct sock *sk, char __user *optval, int optlen)
+static int sock_set_dns_uid(struct sock *sk, sockptr_t optval, int optlen)
 {
 	int ret = -EADDRNOTAVAIL;
 
@@ -738,7 +738,7 @@ static int sock_set_dns_uid(struct sock *sk, char __user *optval, int optlen)
 	if (optlen == sizeof(uid_t)) {
 		uid_t dns_uid;
 		ret = -EFAULT;
-		if (copy_from_user(&dns_uid, optval, sizeof(dns_uid)))
+		if (copy_from_sockptr(&dns_uid, optval, sizeof(dns_uid)))
 			goto out;
 		memcpy(&sk->knox_dns_uid, &dns_uid, sizeof(sk->knox_dns_uid));
 		ret = 0;
@@ -749,7 +749,7 @@ out:
 }
 
 /** The function sets the pid and the process name associated with the dns socket. **/
-static int sock_set_dns_pid(struct sock *sk, char __user *optval, int optlen)
+static int sock_set_dns_pid(struct sock *sk, sockptr_t optval, int optlen)
 {
 	int ret = -EADDRNOTAVAIL;
 	struct pid *pid_struct = NULL;
@@ -763,7 +763,7 @@ static int sock_set_dns_pid(struct sock *sk, char __user *optval, int optlen)
 	if (optlen == sizeof(pid_t)) {
 		pid_t dns_pid;
 		ret = -EFAULT;
-		if (copy_from_user(&dns_pid, optval, sizeof(dns_pid)))
+		if (copy_from_sockptr(&dns_pid, optval, sizeof(dns_pid)))
 			goto out;
 		memcpy(&sk->knox_dns_pid, &dns_pid, sizeof(sk->knox_dns_pid));
 		if(check_ncm_flag()) {
