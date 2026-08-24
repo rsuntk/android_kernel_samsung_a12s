@@ -715,7 +715,12 @@ void object_err(struct kmem_cache *s, struct page *page,
 {
 	pr_auto_once(7);
 	slab_bug(s, "%s", reason);
-	print_trailer(s, page, object);
+	if (!object || !check_valid_pointer(s, page, object)) {
+		print_page_info(page);
+		pr_err("Invalid pointer 0x%p\n", object);
+	} else {
+		print_trailer(s, page, object);
+	}
 	pr_auto_disable(7);
 }
 

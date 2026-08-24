@@ -262,14 +262,25 @@ int initialize_indio_dev(struct device *dev)
 
 void shub_report_sensordata(int type, u64 timestamp, char *data, int data_len)
 {
-	struct iio_dev *indio_dev = get_iio_device(type);
+	struct iio_dev *indio_dev;
 	struct shub_sensor *sensor = get_sensor(type);
 	char *buf;
+	int total_sz;
 
-	if (!sensor || !indio_dev)
+	if (!sensor)
 		return;
 
-	buf = kzalloc(sensor->report_event_size + sizeof(timestamp), GFP_KERNEL);
+	if (data_len < 0 || data_len > sensor->report_event_size) {
+		shub_errf("Invalid data_len %d (max %d)", data_len, sensor->report_event_size);
+		return;
+	}
+
+	indio_dev = get_iio_device(type);
+	if (!indio_dev)
+		return;
+
+	total_sz = sensor->report_event_size + sizeof(timestamp);
+	buf = kzalloc(total_sz, GFP_KERNEL);
 	if (!buf) {
 		shub_errf("fail to alloc memory");
 		return;
@@ -281,11 +292,8 @@ void shub_report_sensordata(int type, u64 timestamp, char *data, int data_len)
 	if (sensor->spec.is_wake_up)
 		shub_wake_lock_timeout(300);
 
-	memcpy(buf + data_len, &timestamp, sizeof(timestamp));
-	mutex_lock(&indio_dev->mlock);
+	memcpy(buf + sensor->report_event_size, &timestamp, sizeof(timestamp));
 	iio_push_to_buffers(indio_dev, buf);
-	mutex_unlock(&indio_dev->mlock);
-
 	kfree(buf);
 }
 

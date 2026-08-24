@@ -1283,6 +1283,7 @@ static int exynos_iommu_of_xlate(struct device *master,
 		return -ENODEV;
 
 	data = platform_get_drvdata(sysmmu_pdev);
+	put_device(&sysmmu_pdev->dev);
 	if (!data)
 		return -ENODEV;
 

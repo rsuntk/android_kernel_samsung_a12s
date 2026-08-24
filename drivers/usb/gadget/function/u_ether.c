@@ -1499,6 +1499,10 @@ void gether_disconnect(struct gether *link)
 
 	DBG(dev, "%s\n", __func__);
 
+	spin_lock(&dev->lock);
+	dev->port_usb = NULL;
+	spin_unlock(&dev->lock);
+
 	netif_stop_queue(dev->net);
 	netif_carrier_off(dev->net);
 	printk(KERN_ERR"usb: %s No of ZLPS (%d)\n", __func__, dev->no_of_zlp);
@@ -1560,6 +1564,7 @@ void gether_disconnect(struct gether *link)
 	dev->header_len = 0;
 	dev->unwrap = NULL;
 	dev->wrap = NULL;
+
 	if (dev->en_timer) {
 		hrtimer_cancel(&dev->tx_timer);
 		dev->en_timer = 0;
