@@ -304,7 +304,7 @@ int __init hard_reset_hook_init(void)
 {
 	size_t i;
 
-	hrtimer_init(&hard_reset_hook_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+	hrtimer_init(&hard_reset_hook_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	hard_reset_hook_timer.function = hard_reset_hook_callback;
 	hold_time = ktime_set(6, 0); /* 6 seconds */
 
