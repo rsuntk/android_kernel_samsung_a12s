@@ -349,9 +349,6 @@ static void __cqhci_enable(struct cqhci_host *cq_host)
 
 	cqhci_writel(cq_host, cqcfg, CQHCI_CFG);
 
-	if (cqhci_readl(cq_host, CQHCI_CTL) & CQHCI_HALT)
-		cqhci_writel(cq_host, 0, CQHCI_CTL);
-
 	ctl = cqhci_readl(cq_host, CQHCI_CTL);
 	ctl |= CQHCI_CLEAR_ALL_TASKS;
 	cqhci_writel(cq_host, ctl, CQHCI_CTL);
@@ -1112,10 +1109,8 @@ static bool cqhci_halt(struct mmc_host *mmc, unsigned int timeout)
 
 	ret = cqhci_halted(cq_host);
 
-	if (!ret) {
-		mmc_card_error_logging(mmc->card, NULL, HALT_UNHALT_ERR);
+	if (!ret)
 		pr_warn("%s: cqhci: Failed to halt\n", mmc_hostname(mmc));
-	}
 
 	return ret;
 }
