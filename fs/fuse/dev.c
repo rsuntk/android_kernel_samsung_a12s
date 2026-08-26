@@ -22,7 +22,6 @@
 #include <linux/swap.h>
 #include <linux/splice.h>
 #include <linux/sched.h>
-#include <linux/freezer.h>
 
 MODULE_ALIAS_MISCDEV(FUSE_MINOR);
 MODULE_ALIAS("devname:fuse");
@@ -114,8 +113,7 @@ static struct fuse_req *fuse_get_req(struct fuse_mount *fm, bool for_background)
 
 	if (fuse_block_alloc(fc, for_background)) {
 		err = -EINTR;
-		/* @fs.sec -- 9992f9e9ebd25b0dcc80951a9e4f4fc2e71a08c6 -- */
-		if (fuse_wait_event_killable_exclusive(fc->blocked_waitq,
+		if (wait_event_killable_exclusive(fc->blocked_waitq,
 				!fuse_block_alloc(fc, for_background)))
 			goto out;
 	}
@@ -236,7 +234,7 @@ __releases(fiq->lock)
 		fuse_len_args(req->args->in_numargs,
 			      (struct fuse_arg *) req->args->in_args);
 	list_add_tail(&req->list, &fiq->pending);
-	fiq->ops->wake_pending_and_unlock(fiq,sync);
+	fiq->ops->wake_pending_and_unlock(fiq, sync);
 }
 
 void fuse_queue_forget(struct fuse_conn *fc, struct fuse_forget_link *forget,
@@ -398,7 +396,7 @@ static void request_wait_answer(struct fuse_req *req)
 
 	if (!test_bit(FR_FORCE, &req->flags)) {
 		/* Only fatal signals may interrupt this */
-		err = fuse_wait_event_killable(req->waitq,
+		err = wait_event_killable(req->waitq,
 					test_bit(FR_FINISHED, &req->flags));
 		if (!err)
 			return;
@@ -419,9 +417,7 @@ static void request_wait_answer(struct fuse_req *req)
 	 * Either request is already in userspace, or it was forced.
 	 * Wait it out.
 	 */
-	while (!test_bit(FR_FINISHED, &req->flags))
-		wait_event_freezable(req->waitq,
-				test_bit(FR_FINISHED, &req->flags));
+	wait_event(req->waitq, test_bit(FR_FINISHED, &req->flags));
 }
 
 static void __fuse_request_send(struct fuse_req *req)
@@ -697,10 +693,6 @@ static void fuse_copy_finish(struct fuse_copy_state *cs)
 			flush_dcache_page(cs->pg);
 			set_page_dirty_lock(cs->pg);
 		}
-		/*
-		 * The page could be GUP page(see iov_iter_get_pages in
-		 * fuse_copy_fill) so use put_page to release it.
-		 */
 		put_page(cs->pg);
 	}
 	cs->pg = NULL;
@@ -945,7 +937,7 @@ static int fuse_ref_page(struct fuse_copy_state *cs, struct page *page,
 	cs->nr_segs++;
 	cs->len = 0;
 
-	return 0;
+	return lock_request(cs->req);
 }
 
 /*
@@ -967,7 +959,7 @@ static int fuse_copy_page(struct fuse_copy_state *cs, struct page **pagep,
 			 * Can't control lifetime of pipe buffers, so always
 			 * copy user pages.
 			 */
-			if (cs->req->user_pages) {
+			if (cs->req->args->user_pages) {
 				err = fuse_copy_fill(cs);
 				if (err)
 					return err;
@@ -1257,12 +1249,6 @@ static ssize_t fuse_dev_do_read(struct fuse_dev *fud, struct file *file,
 			   sizeof(struct fuse_write_in) +
 			   fc->max_write))
 		return -EINVAL;
-
-	if ((current->flags & PF_NOFREEZE) == 0) {
-		current->flags |= PF_NOFREEZE | PF_MEMALLOC_NOFS;
-		printk_ratelimited(KERN_WARNING "%s(%d): This thread should not be frozen\n",
-				current->comm, task_pid_nr(current));
-	}
 
  restart:
 	for (;;) {
@@ -1627,6 +1613,10 @@ static int fuse_notify_store(struct fuse_conn *fc, unsigned int size,
 	inode = fuse_ilookup(fc, nodeid,  NULL);
 	if (!inode)
 		goto out_up_killsb;
+	if (!S_ISREG(inode->i_mode)) {
+		err = -EINVAL;
+		goto out_iput;
+	}
 
 	mapping = inode->i_mapping;
 	index = outarg.offset >> PAGE_SHIFT;
@@ -1748,6 +1738,10 @@ static int fuse_retrieve(struct fuse_mount *fm, struct inode *inode,
 		page = find_get_page(mapping, index);
 		if (!page)
 			break;
+		if (!PageUptodate(page)) {
+			put_page(page);
+			break;
+		}
 
 		this_num = min_t(unsigned, num, PAGE_SIZE - offset);
 		ap->pages[ap->num_pages] = page;
@@ -1798,7 +1792,10 @@ static int fuse_notify_retrieve(struct fuse_conn *fc, unsigned int size,
 
 	inode = fuse_ilookup(fc, nodeid, &fm);
 	if (inode) {
-		err = fuse_retrieve(fm, inode, &outarg);
+		if (!S_ISREG(inode->i_mode))
+			err = -EINVAL;
+		else
+			err = fuse_retrieve(fm, inode, &outarg);
 		iput(inode);
 	}
 	up_read(&fc->killsb);
@@ -2245,7 +2242,7 @@ void fuse_wait_aborted(struct fuse_conn *fc)
 {
 	/* matches implicit memory barrier in fuse_drop_waiting() */
 	smp_mb();
-	fuse_wait_event(fc->blocked_waitq, atomic_read(&fc->num_waiting) == 0);
+	wait_event(fc->blocked_waitq, atomic_read(&fc->num_waiting) == 0);
 }
 
 int fuse_dev_release(struct inode *inode, struct file *file)
