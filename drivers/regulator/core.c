@@ -4462,6 +4462,19 @@ regulator_register(const struct regulator_desc *regulator_desc,
 		goto wash;
 	}
 
+	/*
+	 * Workaround: force vdd_ldo28 to always-on from the core, equivalent
+	 * to "regulator-always-on" + "regulator-boot-on" in the device tree.
+	 * set_machine_constraints() below will enable it and take a use_count
+	 * reference, so consumers can no longer switch it off.
+	 */
+	if (!strcmp(rdev_get_name(rdev), "vdd_ldo28") ||
+	    (regulator_desc->name &&
+	     !strcmp(regulator_desc->name, "vdd_ldo28"))) {
+		rdev->constraints->always_on = true;
+		rdev->constraints->boot_on = true;
+	}
+
 	if (init_data && init_data->supply_regulator)
 		rdev->supply_name = init_data->supply_regulator;
 	else if (regulator_desc->supply_name)
