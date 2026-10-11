@@ -4471,6 +4471,7 @@ regulator_register(const struct regulator_desc *regulator_desc,
 	if (!strcmp(rdev_get_name(rdev), "vdd_ldo28") ||
 	    (regulator_desc->name &&
 	     !strcmp(regulator_desc->name, "vdd_ldo28"))) {
+		pr_info_once("%s: set vdd_ldo28 to always on!\n", __func__);
 		rdev->constraints->always_on = true;
 		rdev->constraints->boot_on = true;
 	}
