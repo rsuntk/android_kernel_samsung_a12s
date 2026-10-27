@@ -1605,7 +1605,6 @@ int panel_clean_board(struct device *dev)
 	return 0;
 }
 
-
 static int __init decon_board_init(void)
 {
 	panel_lut_ddi_recommend_init();
@@ -1625,7 +1624,7 @@ static int __init decon_board_late_initcall(void)
 late_initcall_sync(decon_board_late_initcall);
 
 #ifdef CONFIG_EXYNOS_DECON_LCD_A12S_BLIC_DUAL
-static int a12s_regulator_core_initcall(void)
+static int __init a12s_regulator_core_initcall(void)
 {
 	struct device_node *np = NULL;
 	struct property *prop_new = NULL;
