@@ -325,8 +325,6 @@ static int exyswd_rng_suspend(struct device *dev)
 	unsigned long flag;
 	int ret = HWRNG_RET_OK;
 
-    printk("[ExyRNG] rng suspend function called\n");
-
 	spin_lock_irqsave(&hwrandom_lock, flag);
 	if (hwrng_read_flag) {
 		reg0 = SMC_CMD_RANDOM;
@@ -351,8 +349,6 @@ static int exyswd_rng_resume(struct device *dev)
 	uint64_t reg3;
 	unsigned long flag;
 	int ret = HWRNG_RET_OK;
-
-    printk("[ExyRNG] rng resume function called\n");
 
 	spin_lock_irqsave(&hwrandom_lock, flag);
 #if defined(CONFIG_EXYRNG_FIPS_COMPLIANCE)
